@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>889</width>
+    <height>591</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>基础设置</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="LiZhi">
+        <property name="title">
+         <string>恢复理智</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="yaoji">
+           <property name="text">
+            <string>药剂恢复</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="yuanshi">
+           <property name="text">
+            <string>至纯原石恢复</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="buhuifu">
+           <property name="text">
+            <string>不恢复</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="device">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="title">
+         <string>设备选择</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinAndMaxSize</enum>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QListWidget" name="Eqlist">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>70</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>200</height>
+            </size>
+           </property>
+           <property name="tabletTracking">
+            <bool>false</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="lineWidth">
+            <number>1</number>
+           </property>
+           <property name="midLineWidth">
+            <number>0</number>
+           </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarAlwaysOn</enum>
+           </property>
+           <property name="horizontalScrollBarPolicy">
+            <enum>Qt::ScrollBarAsNeeded</enum>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="autoScrollMargin">
+            <number>1</number>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="tabKeyNavigation">
+            <bool>true</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectItems</enum>
+           </property>
+           <property name="horizontalScrollMode">
+            <enum>QAbstractItemView::ScrollPerItem</enum>
+           </property>
+           <property name="movement">
+            <enum>QListView::Static</enum>
+           </property>
+           <property name="flow">
+            <enum>QListView::TopToBottom</enum>
+           </property>
+           <property name="isWrapping" stdset="0">
+            <bool>false</bool>
+           </property>
+           <property name="resizeMode">
+            <enum>QListView::Adjust</enum>
+           </property>
+           <property name="layoutMode">
+            <enum>QListView::SinglePass</enum>
+           </property>
+           <property name="viewMode">
+            <enum>QListView::ListMode</enum>
+           </property>
+           <property name="modelColumn">
+            <number>0</number>
+           </property>
+           <property name="uniformItemSizes">
+            <bool>false</bool>
+           </property>
+           <property name="selectionRectVisible">
+            <bool>false</bool>
+           </property>
+           <property name="currentRow">
+            <number>-1</number>
+           </property>
+           <property name="sortingEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="RefreshBtn">
+           <property name="text">
+            <string>刷新设备</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>关卡选择</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTreeWidget" name="MissionTree">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>70</height>
+            </size>
+           </property>
+           <column>
+            <property name="text">
+             <string>关卡</string>
+            </property>
+           </column>
+           <item>
+            <property name="text">
+             <string>材料本</string>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <item>
+             <property name="text">
+              <string>龙门币</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>CE-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CE-2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CE-3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CE-4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CE-5</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>经验本</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <italic>false</italic>
+               <bold>true</bold>
+               <underline>false</underline>
+               <strikeout>false</strikeout>
+               <kerning>true</kerning>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>LS-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LS-2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LS-3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LS-4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>LS-5</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>碳素组</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>SK-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SK-2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SK-3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SK-4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SK-5</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>技能书</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>CA-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CA-2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CA-3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CA-4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CA-5</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>采购证</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>AP-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>AP-2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>AP-3</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>AP-4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>AP-5</string>
+              </property>
+             </item>
+            </item>
+           </item>
+           <item>
+            <property name="text">
+             <string>精英</string>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <item>
+             <property name="text">
+              <string>医疗/重装</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>PR-A-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>PR-A-2</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>术士/狙击</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>PR-B-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>PR-B-2</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>先锋/辅助</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>PR-C-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>PR-C-2</string>
+              </property>
+             </item>
+            </item>
+            <item>
+             <property name="text">
+              <string>近卫/特种</string>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>PR-D-1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>PR-D-2</string>
+              </property>
+             </item>
+            </item>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="SelfMission">
+           <property name="text">
+            <string>自己指定关卡</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>运行日志</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QTextBrowser" name="LogText">
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_7">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="ClearLogBtn">
+        <property name="text">
+         <string>清除日志</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RunBtn">
+        <property name="text">
+         <string>运行</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="EndButon">
+        <property name="text">
+         <string>结束运行</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>ClearLogBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>LogText</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>526</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>338</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
