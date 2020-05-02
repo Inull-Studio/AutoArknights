@@ -82,7 +82,7 @@ class M_to_L(object):
         system('adb -s '+eq+' pull /sdcard/lizhi.png Data\\lizhi.png 1>nul 2>nul')
         system('adb -s '+eq+' shell rm /sdcard/lizhi.png')
         lizhiImg = imread('Data\\lizhi.png')
-        if lizhiImg[int(size[1]*(5/36)), int(size[0]*(75/144))][2] == 255 or lizhiImg[int(size[1]*(5/36)), int(size[0]*(106/144))][2] == 255:
+        if lizhiImg[int(size[1]*(5/9)), int(size[0]*(120/144))][2] != 130:
             if self.lizhi['buhuifu']:
                 return 'buhuifu'
             else:
