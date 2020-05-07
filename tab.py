@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(889, 591)
+        Form.resize(291, 243)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
         self.verticalLayout.setContentsMargins(2, 2, 2, 2)
@@ -206,6 +206,7 @@ class Ui_Form(object):
         self.verticalLayout_3.setSpacing(1)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.LogText = QtWidgets.QTextBrowser(self.groupBox_4)
+        self.LogText.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.LogText.setFont(font)

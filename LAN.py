@@ -16,7 +16,7 @@ class NewThread(threading.Thread):
             self.result=None
     def getresult(self):
         return self.result
-def Connect(host,ports:list):
+def Connects(host,ports:list):
     tlist=[]
     try:
         for port in ports:
@@ -37,5 +37,5 @@ def Connect(host,ports:list):
     except Exception as e:
         return False
 if __name__ == '__main__':
-    a=Connect('192.168.0.101',['62001','4455','135','1335',60001,61001,63001])
+    a=Connects('192.168.0.101',['62001','4455','135','1335',60001,61001,63001])
     print(a)
