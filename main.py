@@ -10,8 +10,11 @@ else:
     import os
     import LAN
     from MissionLocation import M_to_L
-    import re
-    import win32gui
+    import re,six
+    import packaging
+    import packaging.version
+    import packaging.specifiers
+    import packaging.requirements
     import threading
     from subprocess import run, PIPE
     from os import walk, listdir
@@ -383,11 +386,12 @@ class MainWin(QMainWindow, Ui_MainWindow):
             else:
                 if con.get('Nox','portlist'):
                     a=QMessageBox(self)
+                    a.setWindowTitle('是否使用本地端口')
                     a.setText('检测到本地存在模拟器')
-                    a.setInformativeText('是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因)')
+                    a.setInformativeText('是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)')
                     a.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
-                    ok=a.exec_()
-                    if ok==QMessageBox.Ok:
+                    ok=a.exec()
+                    if ok==QMessageBox.Yes:
                         portlist = eval(con.get('Nox', 'portlist'))
                         if not con.get('Nox', 'rport'):
                             result = LAN.Connects(host, portlist)
