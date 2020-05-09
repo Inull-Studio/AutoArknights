@@ -1,39 +1,37 @@
-try:
-    import cv2
-    import PyQt5
-except:
-    pass
-else:
-    import sys
-    import winreg
-    from configparser import ConfigParser
-    import os
-    import LAN
-    from MissionLocation import M_to_L
-    import re,six
-    import packaging
-    import packaging.version
-    import packaging.specifiers
-    import packaging.requirements
-    import threading
-    from subprocess import run, PIPE
-    from os import walk, listdir
-    from time import sleep, localtime, strftime
-    from PyQt5 import sip
-    from PyQt5.QtWidgets import *
-    from PyQt5.QtCore import *
-    from PyQt5.QtGui import *
-    import logging
-    from tab import Ui_Form
-    from test import Ui_MainWindow
+import sys
+import winreg
+from configparser import ConfigParser
+import os
+import LAN
+from MissionLocation import M_to_L
+import re
+import six
+import packaging
+import packaging.version
+import packaging.specifiers
+import packaging.requirements
+import threading
+from subprocess import run, PIPE
+from os import walk, listdir, popen
+from time import sleep, localtime, strftime
+from PyQt5 import sip
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+import logging
+from tab import Ui_Form
+from test import Ui_MainWindow
+
+logLevel = {10: 'DEBUG', 20: 'INFO', 30: 'WARN', 40: 'ERROR', 50: 'CRITICAL'}
 
 
 class Tab(QWidget, Ui_Form):
     """docstring for Tab"""
 
-    def __init__(self, tabname: str):
-        super(Tab, self).__init__()
+    def __init__(self, tabname: str, parent=None):
+        super(Tab, self).__init__(parent)
         self.setupUi(self)
+        self.xianzhi = 1
         self.selfmission = False
         self.end = False
         self.LiZhi = {'buhuifu': True, 'yaoji': False, 'yuanshi': False}
@@ -58,6 +56,16 @@ class Tab(QWidget, Ui_Form):
             target=self.testEq, daemon=True).start())
         self.RunBtn.clicked.connect(self.Run_clicked)
         self.EndButon.clicked.connect(self.KillRun)
+        self.Times.valueChanged.connect(self.xianzhiTimes)
+        self.threeTimes.valueChanged.connect(self.showThreeTimes)
+
+    def showThreeTimes(self):
+        self.setLog(self.tabname,logging.INFO,'设置限制三星次数为{}'.format(self.threeTimes.value()))
+
+    def xianzhiTimes(self):
+        self.xianzhi = self.Times.value()
+        self.setLog(self.tabname, logging.INFO,
+                    '设置限制运行次数为{}'.format(self.Times.value()))
 
     def KillRun(self):
         self.end = True
@@ -89,7 +97,9 @@ class Tab(QWidget, Ui_Form):
     def LoopMission(self, runMission=None, M_location=None):
         three_times = 0
         if self.selfmission and not M_location and runMission:
-            while True:
+            while self.xianzhi:
+                if not self.buxianzhi.isChecked():
+                    self.xianzhi -= 1
                 if self.end:
                     self.setLog(self.tabname, logging.INFO,
                                 '结束运行=======================================')
@@ -121,10 +131,6 @@ class Tab(QWidget, Ui_Form):
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
                                 '不自动恢复理智,停止自动刷=======================')
-                    if self.end:
-                        self.setLog(self.tabname, logging.INFO,
-                                    '结束运行=======================================')
-                        return
                     return
                 else:
                     return
@@ -145,10 +151,6 @@ class Tab(QWidget, Ui_Form):
                     self.setLog(self.tabname, logging.INFO,
                                 '结束运行=======================================')
                     return
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 while True:
                     if self.end:
                         self.setLog(self.tabname, logging.INFO,
@@ -164,8 +166,9 @@ class Tab(QWidget, Ui_Form):
                     three = runMission.sanxing(
                         self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
                     if 'N' in three:
-                        three_times += 1
-                        if three_times == 3:
+                        if not self.checkThree.isChecked():
+                            three_times += 1
+                        if three_times == self.threeTimes.value():
                             self.setLog(self.tabname, logging.ERROR,
                                         '非三星次数过多,已停止===================')
                             return
@@ -183,11 +186,11 @@ class Tab(QWidget, Ui_Form):
                             return
                         sleep(8)
                         break
-                    else:
-                        pass
                     pass
         else:
-            while True:
+            while self.xianzhi:
+                if not self.buxianzhi.isChecked():
+                    self.xianzhi -= 1
                 if not M_location(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
                     return
                 sleep(0.5)
@@ -230,20 +233,24 @@ class Tab(QWidget, Ui_Form):
                     three = runMission.sanxing(
                         self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
                     if 'N' in three:
-                        three_times += 1
-                        if three_times == 3:
-                            self.setLog(
-                                self.tabname, logging.ERROR, '非三星次数过多,已停止===================')
+                        if not self.checkThree.isChecked():
+                            three_times += 1
+                        if three_times == self.threeTimes.value():
+                            self.setLog(self.tabname, logging.ERROR,
+                                        '非三星次数超限制,已停止===================')
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
                         break
                     elif 'Y' in three:
                         self.setLog(self.tabname, logging.INFO, '是三星')
+                        if self.end:
+                            self.setLog(
+                                self.tabname, logging.INFO, '结束运行=======================================')
+                            return
                         sleep(8)
                         break
-                    else:
-                        pass
                     pass
+        self.setLog(self.tabname, logging.INFO, '运行完成')
 
     def Eq_clicked(self):
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
@@ -269,18 +276,22 @@ class Tab(QWidget, Ui_Form):
         Tlist = []
 
         def Connect(port, host='127.0.0.1'):
+            QApplication.processEvents()
             run(['adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
-        hosts = con.get('Nox', 'rhost')
-        if not hosts:
+        rhosts = con.get('Nox', 'rhost')
+        if not rhosts:
             ports = con.get('Nox', 'portlist')
             if ports:
                 for port in ports:
                     t = threading.Thread(target=Connect, args=(port,))
                     Tlist.append(t)
                     t.start()
+                    QApplication.processEvents()
                 for t in Tlist:
+                    QApplication.processEvents()
                     t.join()
                 for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
+                    QApplication.processEvents()
                     if 'List' in l.split(' '):
                         continue
                     if 'offline' in l:
@@ -298,25 +309,31 @@ class Tab(QWidget, Ui_Form):
                 else:
                     self.Eqlist.addItems(eq_list)
             else:
-                QMessageBox.warning(self, '错误', '夜神模拟器未有设备')
+                self.setLog(self.tabname, logging.CRITICAL,
+                            '夜神模拟器未有设备(未扫描模拟器)')
+                return
         else:
-            host = eval(host)
-            ports = con.get('Nox', 'rport')
-            if port:
-                for port in ports:
-                    for host in hosts:
+            rports = con.get('Nox', 'rport')
+            if rport:
+                for port in rports:
+                    for host in rhosts:
                         t = threading.Thread(target=Connect, args=(port, host))
                         Tlist.append(t)
                         t.start()
+                        QApplication.processEvents()
                 for t in Tlist:
+                    QApplication.processEvents()
                     t.join()
+                    QApplication.processEvents()
                 for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
+                    QApplication.processEvents()
                     if 'List' in l.split(' '):
                         continue
                     if 'offline' in l:
                         continue
                     b = l.split('\t')[0]
                     for host in hosts:
+                        QApplication.processEvents()
                         if '127.0.0.1' in b:
                             eq_list.append(b+'\t模拟器')
                         elif host in b:
@@ -331,7 +348,9 @@ class Tab(QWidget, Ui_Form):
                 else:
                     self.Eqlist.addItems(eq_list)
             else:
-                QMessageBox.warning(self, '错误', '远程夜神模拟器未有设备')
+                self.setLog(self.tabname, logging.CRITICAL,
+                            '夜神模拟器未有设备(未扫描模拟器)')
+                return
 
     def buhuifu_clicked(self):
         self.LiZhi['buhuifu'] = True
@@ -352,7 +371,7 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO, self.yaoji.text()+' 已选择')
 
     def setLog(self, tabname, level, msg):
-        logmsg = f'{level} {tabname}.{msg}'
+        logmsg = f'{logLevel[level]} {tabname}.{msg}'
         self.loger.log(level, f'{tabname}.{msg}')
         self.LogText.append(logmsg)
 
@@ -383,15 +402,17 @@ class MainWin(QMainWindow, Ui_MainWindow):
         if hok:
             if not host:
                 QMessageBox.warning(self, '错误', '未输入主机名或IP地址')
+                return
             else:
-                if con.get('Nox','portlist'):
-                    a=QMessageBox(self)
+                if con.get('Nox', 'portlist'):
+                    a = QMessageBox(self)
                     a.setWindowTitle('是否使用本地端口')
                     a.setText('检测到本地存在模拟器')
-                    a.setInformativeText('是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)')
-                    a.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
-                    ok=a.exec()
-                    if ok==QMessageBox.Yes:
+                    a.setInformativeText(
+                        '是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)')
+                    a.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    ok = a.exec()
+                    if ok == QMessageBox.Yes:
                         portlist = eval(con.get('Nox', 'portlist'))
                         if not con.get('Nox', 'rport'):
                             result = LAN.Connects(host, portlist)
@@ -416,25 +437,32 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 lasthost.append(host)
                                 lastport += eval(con.get('Nox', 'rport'))
                                 lastport += (list(set(result)))
-                                con.set('Nox', 'rhost', str(list(set(lasthost))))
-                                con.set('Nox', 'rport', str(list(set(lastport))))
+                                con.set('Nox', 'rhost', str(
+                                    list(set(lasthost))))
+                                con.set('Nox', 'rport', str(
+                                    list(set(lastport))))
                                 con.write(open('config.ini', 'w'))
                                 QMessageBox.information(
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
                     else:
-                        port,pok=QInputDialog.getInt(self,'输入端口号','请输入远程主机模拟器所开启的端口')
+                        port, pok = QInputDialog.getInt(
+                            self, '输入端口号', '请输入远程主机模拟器所开启的端口')
                         if pok:
-                            if not port or port>65535 or port<0:
-                                QMessageBox.warning(self,'错误','为输入端口号,或端口号不正确')
+                            if not port or port > 65535 or port < 0:
+                                QMessageBox.warning(
+                                    self, '错误', '为输入端口号,或端口号不正确')
+                                return
                             if not con.get('Nox', 'rport'):
                                 result = LAN.Connects(host, [port])
                                 if not result:
                                     QMessageBox.warning(self, '错误', '未开启模拟器')
                                 elif 'unknow' in result:
-                                    QMessageBox.warning(self, '错误', '未知的主机名或IP地址')
+                                    QMessageBox.warning(
+                                        self, '错误', '未知的主机名或IP地址')
                                 else:
                                     con.set('Nox', 'rhost', '[\''+host+'\']')
-                                    con.set('Nox', 'rport', str(list(set(result))))
+                                    con.set('Nox', 'rport', str(
+                                        list(set(result))))
                                     con.write(open('config.ini', 'w'))
                                     QMessageBox.information(
                                         self, '完成', '远程主机扫描完成，刷新设备会检测链接')
@@ -443,22 +471,27 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 if not result:
                                     QMessageBox.warning(self, '错误', '未开启模拟器')
                                 elif 'unknow' in result:
-                                    QMessageBox.warning(self, '错误', '未知的主机名或IP地址')
+                                    QMessageBox.warning(
+                                        self, '错误', '未知的主机名或IP地址')
                                 else:
                                     lasthost += eval(con.get('Nox', 'rhost'))
                                     lasthost.append(host)
                                     lastport += eval(con.get('Nox', 'rport'))
                                     lastport += (list(set(result)))
-                                    con.set('Nox', 'rhost', str(list(set(lasthost))))
-                                    con.set('Nox', 'rport', str(list(set(lastport))))
+                                    con.set('Nox', 'rhost', str(
+                                        list(set(lasthost))))
+                                    con.set('Nox', 'rport', str(
+                                        list(set(lastport))))
                                     con.write(open('config.ini', 'w'))
                                     QMessageBox.information(
                                         self, '完成', '远程主机扫描完成，刷新设备会检测链接')
                 else:
-                    port,pok=QInputDialog.getInt(self,'输入端口号','请输入远程主机模拟器所开启的端口')
+                    port, pok = QInputDialog.getInt(
+                        self, '输入端口号', '请输入远程主机模拟器所开启的端口')
                     if pok:
-                        if not port or port>65535 or port<0:
-                            QMessageBox.warning(self,'错误','为输入端口号,或端口号不正确')
+                        if not port or port > 65535 or port < 0:
+                            QMessageBox.warning(self, '错误', '为输入端口号,或端口号不正确')
+                            return
                         if not con.get('Nox', 'rport'):
                             result = LAN.Connects(host, [port])
                             if not result:
@@ -482,8 +515,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 lasthost.append(host)
                                 lastport += eval(con.get('Nox', 'rport'))
                                 lastport += (list(set(result)))
-                                con.set('Nox', 'rhost', str(list(set(lasthost))))
-                                con.set('Nox', 'rport', str(list(set(lastport))))
+                                con.set('Nox', 'rhost', str(
+                                    list(set(lasthost))))
+                                con.set('Nox', 'rport', str(
+                                    list(set(lastport))))
                                 con.write(open('config.ini', 'w'))
                                 QMessageBox.information(
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
@@ -542,19 +577,19 @@ class MainWin(QMainWindow, Ui_MainWindow):
 
     def showHelp(self):
         QMessageBox.about(self, '使用帮助', '''
-        Config.ini和软件本身是重要文件，必须存在，如果不存在会报错
-            单击"菜单"->"新建"，可以新建一个链接，可以建立无限多个，只要你电脑承受的住，链接是自动运行的必备框架，一个链接代表着一个明日方舟
-            单击"菜单"->"删除"，可以删除当前所在链接，单击"设置"->"删除所有日志文件"，可以删除Log文件夹下的所有日志，必须是在刚启动软件时才能点击
-            单击"设备"->"扫描"，可以扫描夜神模拟器所在目录和夜神模拟器多开数量，每多开一个模拟器必须删除扫描结果，然后重新扫描
-            更多详细资料请在 Help.chm 中查看''')
+Config.ini和软件本身是重要文件，必须存在，如果不存在会报错
+单击"菜单"->"新建"，可以新建一个链接，可以建立无限多个，只要你电脑承受的住，链接是自动运行的必备框架，一个链接代表着一个明日方舟
+单击"菜单"->"删除"，可以删除当前所在链接，单击"设置"->"删除所有日志文件"，可以删除Log文件夹下的所有日志，必须是在刚启动软件时才能点击
+单击"设备"->"扫描"，可以扫描夜神模拟器所在目录和夜神模拟器多开数量，每多开一个模拟器必须删除扫描结果，然后重新扫描
+更多详细资料请在 Help.chm 中查看''')
 
     def showAuthor(self):
         QMessageBox.about(self, '关于作者', '''
-    作者邮箱：2293830442@qq.com
-    作者Github：https://github.com/basket-ball
-    作者bilibili：https://space.bilibili.com/16057264
-    作者CSDN：https://blog.csdn.net/qq_40173711
-    有任何问题请联系邮箱，QQ不加任何人的''')
+作者邮箱：2293830442@qq.com
+作者Github：https://github.com/basket-ball
+作者bilibili：https://space.bilibili.com/16057264
+作者CSDN：https://blog.csdn.net/qq_40173711
+有任何问题请联系邮箱，QQ不加任何人的''')
 
     def showSoft(self):
         QMessageBox.about(self, '关于软件', '版权所有CopyRight © 2020 basket_ball')
@@ -586,6 +621,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
     try:
+        os.chdir(popen('cd').read().strip('\n'))
         app = QApplication(sys.argv)
         win = MainWin()
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
@@ -597,7 +633,7 @@ if __name__ == '__main__':
         threading.Thread(target=win.show(), daemon=True).start()
         sys.exit(app.exec_())
     except FileNotFoundError:
-        QMessageBox.warning(win, '错误', '未找到config.ini\n请验证文件完整性')
+        QMessageBox.critical(win, '错误', '未找到config.ini\n请验证文件完整性')
         sys.exit(2)
     except Exception as e:
         print(e)

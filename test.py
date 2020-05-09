@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(429, 382)
+        MainWindow.resize(500, 500)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 429, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 23))
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
@@ -99,6 +99,6 @@ class Ui_MainWindow(object):
         self.DeleteAllLog.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.Soft.setText(_translate("MainWindow", "关于软件"))
         self.Author.setText(_translate("MainWindow", "关于作者"))
-        self.Help.setText(_translate("MainWindow", "使用帮助"))
+        self.Help.setText(_translate("MainWindow", "帮助"))
         self.UnScan.setText(_translate("MainWindow", "删除扫描结果"))
         self.RemoteScan.setText(_translate("MainWindow", "远程扫描"))

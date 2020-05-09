@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
-    <height>379</height>
+    <width>500</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,7 +45,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>429</width>
+     <width>500</width>
      <height>23</height>
     </rect>
    </property>
@@ -137,7 +137,7 @@
   </action>
   <action name="Help">
    <property name="text">
-    <string>使用帮助</string>
+    <string>帮助</string>
    </property>
   </action>
   <action name="UnScan">

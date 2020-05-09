@@ -7,6 +7,7 @@ from os import system
 import datetime
 from cv2 import imread
 
+logLevel={10:'DEBUG',20:'INFO',30:'WARNING',40:'ERROR',50:'CRITICAL'}
 
 class M_to_L(object):
     def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget,mission: str='自己指定关卡'):
@@ -521,7 +522,7 @@ class M_to_L(object):
         system(self.tap_str.format(eq, size[0]*0.875, size[1]*(8/9)))
 
     def setLog(self, mission, level, msg):
-        logmsg = f'{level} {mission}.{msg}'
+        logmsg = f'{logLevel[level]} {mission}.{msg}'
         self.loger.log(level, f'{mission}.{msg}')
         self.logText.append(logmsg)
 
