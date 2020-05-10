@@ -274,49 +274,38 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO,
                     self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
         Tlist = []
-
         def Connect(port, host='127.0.0.1'):
             QApplication.processEvents()
             run(['adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
         rhosts = con.get('Nox', 'rhost')
-        if not rhosts:
-            ports = con.get('Nox', 'portlist')
-            if ports:
-                for port in ports:
-                    t = threading.Thread(target=Connect, args=(port,))
-                    Tlist.append(t)
-                    t.start()
-                    QApplication.processEvents()
-                for t in Tlist:
-                    QApplication.processEvents()
-                    t.join()
-                for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
-                    QApplication.processEvents()
-                    if 'List' in l.split(' '):
-                        continue
-                    if 'offline' in l:
-                        continue
-                    b = l.split('\t')[0]
-                    if '127.0.0.1' in b:
-                        eq_list.append(b+'\t模拟器')
-                    else:
-                        eq_list.append(b+'\t手机')
-                self.setLog(self.tabname, logging.INFO,
-                            self.Eqlist.objectName()+' 测试完成')
-                if not eq_list:
-                    self.setLog(self.tabname, logging.INFO,
-                                self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+        lports = con.get('Nox', 'portlist')
+        if lports:
+            for port in eval(lports):
+                t = threading.Thread(target=Connect, args=(port,))
+                Tlist.append(t)
+                t.start()
+                QApplication.processEvents()
+            for t in Tlist:
+                QApplication.processEvents()
+                t.join()
+            for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
+                QApplication.processEvents()
+                if 'List' in l.split(' '):
+                    continue
+                if 'offline' in l:
+                    continue
+                b = l.split('\t')[0]
+                if '127.0.0.1' in b:
+                    eq_list.append(b+'\t模拟器')
                 else:
-                    self.Eqlist.addItems(eq_list)
-            else:
-                self.setLog(self.tabname, logging.CRITICAL,
-                            '夜神模拟器未有设备(未扫描模拟器)')
-                return
+                    eq_list.append(b+'\t手机')
         else:
+            self.setLog(self.tabname, logging.WARNING,'本地未有设备(未扫描模拟器)')
+        if rhosts:
             rports = con.get('Nox', 'rport')
-            if rport:
-                for port in rports:
-                    for host in rhosts:
+            if rports:
+                for port in eval(rports):
+                    for host in eval(rhosts):
                         t = threading.Thread(target=Connect, args=(port, host))
                         Tlist.append(t)
                         t.start()
@@ -332,24 +321,24 @@ class Tab(QWidget, Ui_Form):
                     if 'offline' in l:
                         continue
                     b = l.split('\t')[0]
-                    for host in hosts:
-                        QApplication.processEvents()
-                        if '127.0.0.1' in b:
-                            eq_list.append(b+'\t模拟器')
-                        elif host in b:
-                            eq_list.app(b+'\t模拟器')
-                        else:
-                            eq_list.append(b+'\t手机')
-                self.setLog(self.tabname, logging.INFO,
-                            self.Eqlist.objectName()+' 测试完成')
+                    for host in eval(rhosts):
+                        for port in eval(rports):
+                            QApplication.processEvents()
+                            if '127.0.0.1' in b:
+                                eq_list.append(b+'\t模拟器')
+                            elif host in b and int(port)>50000:
+                                eq_list.append(b+'\t模拟器')
+                            else:
+                                eq_list.append(b+'\t手机')
+                self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 测试完成')
+                eq_list=list(set(eq_list))
                 if not eq_list:
                     self.setLog(self.tabname, logging.INFO,
                                 self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
                 else:
                     self.Eqlist.addItems(eq_list)
             else:
-                self.setLog(self.tabname, logging.CRITICAL,
-                            '夜神模拟器未有设备(未扫描模拟器)')
+                self.setLog(self.tabname, logging.WARNING,'远程地址未有设备(未扫远程描模)')
                 return
 
     def buhuifu_clicked(self):
@@ -615,13 +604,13 @@ Config.ini和软件本身是重要文件，必须存在，如果不存在会报�
             else:
                 NewTab = Tab(tabname)
                 NewTab.setObjectName(tabname)
-                self.Log = logging.getLogger()
                 self.MainTab.addTab(NewTab, tabname)
 
 
 if __name__ == '__main__':
     try:
         os.chdir(popen('cd').read().strip('\n'))
+        popen('adb nodaemon server')
         app = QApplication(sys.argv)
         win = MainWin()
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
