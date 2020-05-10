@@ -282,7 +282,7 @@ class Ui_Form(object):
         self.ClearLogBtn.clicked.connect(self.LogText.clear)
         self.buxianzhi.toggled['bool'].connect(self.Times.setDisabled)
         self.SelfMission.toggled['bool'].connect(self.MissionTree.setDisabled)
-        self.checkThree.toggled['bool'].connect(self.threeTimes.setEnabled)
+        self.checkThree.toggled['bool'].connect(self.threeTimes.setDisabled)
         QtCore.QMetaObject.connectSlotsByName(Form)
         Form.setTabOrder(self.RunBtn, self.LogText)
         Form.setTabOrder(self.LogText, self.EndButon)
