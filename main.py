@@ -1,5 +1,6 @@
 import sys
 import winreg
+import ctypes,inspect
 from configparser import ConfigParser
 import os
 import LAN
@@ -33,16 +34,14 @@ class Tab(QWidget, Ui_Form):
         self.setupUi(self)
         self.xianzhi = 1
         self.selfmission = False
-        self.end = False
+        self.running=None
         self.LiZhi = {'buhuifu': True, 'yaoji': False, 'yuanshi': False}
         self.Screen_size = []
-        self.encoding = str(run(
-            ['cmd', '/c', 'chcp'], stdout=PIPE).stdout).strip('\'').strip(r'\n\r').split(' ')[-1]
+        self.encoding = str(run(['cmd', '/c', 'chcp'], stdout=PIPE).stdout).strip('\'').strip(r'\n\r').split(' ')[-1]
         self.tabname = tabname
         self.loger = logging.getLogger(tabname)
         self.loger.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(
-            '.\\Log\\'+tabname+'.log', mode='a', encoding='utf8')
+        handler = logging.FileHandler('.\\Log\\'+tabname+'.log', mode='a', encoding='utf8')
         handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S'))
         self.loger.addHandler(handler)
@@ -60,7 +59,8 @@ class Tab(QWidget, Ui_Form):
         self.threeTimes.valueChanged.connect(self.showThreeTimes)
 
     def showThreeTimes(self):
-        self.setLog(self.tabname,logging.INFO,'设置限制三星次数为{}'.format(self.threeTimes.value()))
+        self.setLog(self.tabname, logging.INFO,
+                    '设置限制三星次数为{}'.format(self.threeTimes.value()))
 
     def xianzhiTimes(self):
         self.xianzhi = self.Times.value()
@@ -68,17 +68,37 @@ class Tab(QWidget, Ui_Form):
                     '设置限制运行次数为{}'.format(self.Times.value()))
 
     def KillRun(self):
-        self.end = True
+        try:
+            if self.running:
+                self._async_raise(self.running,SystemExit)
+                self.setLog(self.tabname, logging.INFO,'=====结束运行=====')
+                self.running=None
+        except Exception as e:
+            self.setLog(self.tabname,logging.WARNING,'进程未结束')
+
+    def _async_raise(self,thread, exctype):
+        """raises the exception, performs cleanup if needed"""
+        if not inspect.isclass(exctype):
+            exctype = type(exctype)
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, ctypes.py_object(exctype))
+        if res == 0:
+            raise ValueError("invalid thread id")
+        elif res != 1:
+            # """if it returns a number greater than one, you're in trouble,
+            # and you should call it again with exc=NULL to revert the effect"""
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+            raise SystemError("PyThreadState_SetAsyncExc failed")
 
     def Run_clicked(self):
-        self.end = False
+        if self.running:
+            self.setLog(self.tabname,logging.INFO,'正在运行中，请不要重复运行')
+            return
+        self.setLog(self.tabname, logging.INFO,'开始运行=======================================')
         if self.SelfMission.isChecked():
-            self.setLog(self.tabname, logging.INFO,
-                        '开始运行=======================================')
             self.selfmission = True
             mission = M_to_L(self.LiZhi, self.loger, self.LogText)
-            threading.Thread(target=self.LoopMission, args=(
-                mission,), daemon=True, name='Run').start()
+            self.running = threading.Thread(target=self.LoopMission, args=(mission,), daemon=True, name=self.tabname)
+            self.running.start()
             return
         if not self.Screen_size:
             self.setLog(self.tabname, logging.WARN, '没有选中活动设备')
@@ -86,13 +106,10 @@ class Tab(QWidget, Ui_Form):
         if not self.MissionTree.currentItem().text(0):
             self.setLog(self.tabname, logging.WARN, '没有选中关卡')
             return
-        self.setLog(self.tabname, logging.INFO,
-                    '开始运行=======================================')
-        runMission = M_to_L(self.LiZhi, self.loger, self.LogText,
-                            self.MissionTree.currentItem().text(0))
+        runMission = M_to_L(self.LiZhi, self.loger, self.LogText,self.MissionTree.currentItem().text(0))
         M_location = runMission.retMission()
-        threading.Thread(target=self.LoopMission, args=(
-            M_location, runMission), daemon=True, name='Run').start()
+        self.running = threading.Thread(target=self.LoopMission, args=(M_location, runMission), daemon=True, name=self.tabname)
+        self.running.start()
 
     def LoopMission(self, runMission=None, M_location=None):
         three_times = 0
@@ -100,68 +117,26 @@ class Tab(QWidget, Ui_Form):
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 runMission.selfMission(self.Eqlist.currentItem().text().split('\t')[
                                        0], self.Screen_size)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 sleep(0.5)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 lizhi = runMission.checklizhi(
                     self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 if not lizhi:
                     self.setLog(self.tabname, logging.INFO, '理智自动执行成功')
-                    if self.end:
-                        self.setLog(self.tabname, logging.INFO,
-                                    '结束运行=======================================')
-                        return
                     pass
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
                                 '不自动恢复理智,停止自动刷=======================')
                     return
-                else:
-                    return
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
-                run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',
-                     str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
+
+                run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
                 self.setLog(self.tabname, logging.INFO,
-                            '开始运行,60秒后循环检测运行状态,60秒内不能结束')
+                            '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 while True:
-                    if self.end:
-                        self.setLog(self.tabname, logging.INFO,
-                                    '结束运行=======================================')
-                        return
                     if runMission.shengji(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
                         self.setLog(self.tabname, logging.INFO, '检测到升级,正在自动点击')
-                        if self.end:
-                            self.setLog(
-                                self.tabname, logging.INFO, '结束运行=======================================')
-                            return
                         break
                     three = runMission.sanxing(
                         self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
@@ -173,17 +148,9 @@ class Tab(QWidget, Ui_Form):
                                         '非三星次数过多,已停止===================')
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
-                        if self.end:
-                            self.setLog(
-                                self.tabname, logging.INFO, '结束运行=======================================')
-                            return
                         break
                     elif 'Y' in three:
                         self.setLog(self.tabname, logging.INFO, '是三星')
-                        if self.end:
-                            self.setLog(
-                                self.tabname, logging.INFO, '结束运行=======================================')
-                            return
                         sleep(8)
                         break
                     pass
@@ -205,27 +172,11 @@ class Tab(QWidget, Ui_Form):
                     return
                 else:
                     return
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',
                      str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 self.setLog(self.tabname, logging.INFO,
-                            '开始运行,60秒后循环检测运行状态,60秒内不能结束')
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
+                            '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
-                if self.end:
-                    self.setLog(self.tabname, logging.INFO,
-                                '结束运行=======================================')
-                    return
                 while True:
                     if runMission.shengji(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
                         self.setLog(self.tabname, logging.INFO, '检测到升级,正在自动点击')
@@ -243,10 +194,6 @@ class Tab(QWidget, Ui_Form):
                         break
                     elif 'Y' in three:
                         self.setLog(self.tabname, logging.INFO, '是三星')
-                        if self.end:
-                            self.setLog(
-                                self.tabname, logging.INFO, '结束运行=======================================')
-                            return
                         sleep(8)
                         break
                     pass
@@ -274,6 +221,7 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO,
                     self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
         Tlist = []
+
         def Connect(port, host='127.0.0.1'):
             QApplication.processEvents()
             run(['adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
@@ -300,7 +248,7 @@ class Tab(QWidget, Ui_Form):
                 else:
                     eq_list.append(b+'\t手机')
         else:
-            self.setLog(self.tabname, logging.WARNING,'本地未有设备(未扫描模拟器)')
+            self.setLog(self.tabname, logging.WARNING, '本地未有设备(未扫描本地模拟器)')
         if rhosts:
             rports = con.get('Nox', 'rport')
             if rports:
@@ -326,19 +274,20 @@ class Tab(QWidget, Ui_Form):
                             QApplication.processEvents()
                             if '127.0.0.1' in b:
                                 eq_list.append(b+'\t模拟器')
-                            elif host in b and int(port)>50000:
+                            elif host in b and int(port) > 50000:
                                 eq_list.append(b+'\t模拟器')
                             else:
                                 eq_list.append(b+'\t手机')
-                self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 测试完成')
-                eq_list=list(set(eq_list))
+                self.setLog(self.tabname, logging.INFO,
+                            self.Eqlist.objectName()+' 测试完成')
+                eq_list = list(set(eq_list))
                 if not eq_list:
                     self.setLog(self.tabname, logging.INFO,
                                 self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
                 else:
                     self.Eqlist.addItems(eq_list)
             else:
-                self.setLog(self.tabname, logging.WARNING,'远程地址未有设备(未扫远程描模)')
+                self.setLog(self.tabname, logging.WARNING, '远程地址未有设备(未扫远程描模)')
                 return
 
     def buhuifu_clicked(self):
@@ -587,9 +536,9 @@ Config.ini和软件本身是重要文件，必须存在，如果不存在会报�
         try:
             self.__listPort()
         except FileNotFoundError:
-            QMessageBox.warning(self, '文件缺失', '缺少关键文件,请验证程序完整性')
+            QMessageBox.critical(self, '文件缺失', '缺少关键文件,请验证程序完整性')
         except:
-            QMessageBox.warning(self, '模拟器不存在', '夜神模拟器不存在,在链接内扫描可链接手机')
+            QMessageBox.warning(self, '模拟器不存在', '夜神模拟器不存在,在链接内扫描可链接手机/或远程扫描')
 
     def delTab(self):
         self.MainTab.removeTab(self.MainTab.currentIndex())
@@ -600,7 +549,7 @@ Config.ini和软件本身是重要文件，必须存在，如果不存在会报�
         tabname, ok = QInputDialog.getText(self, '输入名称', '请输入新建标签页名称')
         if ok:
             if not tabname:
-                QMessageBox.warning(self, '名称错误', '未知的标签名')
+                QMessageBox.critical(self, '名称错误', '未知的标签名')
             else:
                 NewTab = Tab(tabname)
                 NewTab.setObjectName(tabname)

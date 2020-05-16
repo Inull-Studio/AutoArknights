@@ -2,22 +2,25 @@
 from time import sleep
 from subprocess import run, PIPE
 import logging
+from threading import Thread
 from PyQt5.QtWidgets import QWidget
 from os import system
 import datetime
 from cv2 import imread
 
-logLevel={10:'DEBUG',20:'INFO',30:'WARNING',40:'ERROR',50:'CRITICAL'}
+logLevel = {10: 'DEBUG', 20: 'INFO',
+            30: 'WARNING', 40: 'ERROR', 50: 'CRITICAL'}
+
 
 class M_to_L(object):
-    def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget,mission: str='自己指定关卡'):
+    def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget, mission: str = '自己指定关卡'):
         self.mission = mission
         self.tap_str = 'adb -s {} shell input tap {} {}'
         self.lizhi = lizhi
         self.loger = loger
         self.logText = logText
 
-    def selfMission(self,eq, size):
+    def selfMission(self, eq, size):
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')
             return
@@ -100,9 +103,11 @@ class M_to_L(object):
                     sleep(1)
                     return True
                 elif self.lizhi['yuanshi']:
-                    system('adb -s '+eq+' shell input tap ' +str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
+                    system('adb -s '+eq+' shell input tap ' +
+                           str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
                     system('adb -s '+eq+' shell screencap /sdcard/2.png')
-                    system('adb -s '+eq+' pull /sdcard/2.png Data\\2.png 1>nul 2>nul')
+                    system('adb -s '+eq +
+                           ' pull /sdcard/2.png Data\\2.png 1>nul 2>nul')
                     system('adb -s '+eq+' shell rm /sdcard/2.png')
                     sleep(1)
                     shitou = imread('Data\\2.png')
