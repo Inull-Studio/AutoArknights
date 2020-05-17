@@ -93,7 +93,7 @@ class Tab(QWidget, Ui_Form):
         if self.running:
             self.setLog(self.tabname,logging.INFO,'正在运行中，请不要重复运行')
             return
-        self.setLog(self.tabname, logging.INFO,'开始运行=======================================')
+        self.setLog(self.tabname, logging.INFO,'=====开始运行=====')
         if self.SelfMission.isChecked():
             self.selfmission = True
             mission = M_to_L(self.LiZhi, self.loger, self.LogText)
@@ -127,7 +127,7 @@ class Tab(QWidget, Ui_Form):
                     pass
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
-                                '不自动恢复理智,停止自动刷=======================')
+                                '不自动恢复理智,停止自动刷=============')
                     return
 
                 run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
@@ -145,7 +145,7 @@ class Tab(QWidget, Ui_Form):
                             three_times += 1
                         if three_times == self.threeTimes.value():
                             self.setLog(self.tabname, logging.ERROR,
-                                        '非三星次数过多,已停止===================')
+                                        '非三星次数过多,已停止===============')
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
                         break
@@ -168,7 +168,7 @@ class Tab(QWidget, Ui_Form):
                     pass
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
-                                '不自动恢复理智,停止自动刷=======================')
+                                '不自动恢复理智,停止自动刷=========')
                     return
                 else:
                     return
@@ -188,7 +188,7 @@ class Tab(QWidget, Ui_Form):
                             three_times += 1
                         if three_times == self.threeTimes.value():
                             self.setLog(self.tabname, logging.ERROR,
-                                        '非三星次数超限制,已停止===================')
+                                        '非三星次数超限制,已停止=====')
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
                         break

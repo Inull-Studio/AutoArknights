@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AutoArknight v1.0</string>
+   <string>AutoArknight v1.2.2</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -80,9 +80,34 @@
     <addaction name="Author"/>
     <addaction name="Help"/>
    </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>企鹅物流数据统计</string>
+    </property>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>上报数据</string>
+     </property>
+     <addaction name="report"/>
+     <addaction name="add_report"/>
+    </widget>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>计算规划</string>
+     </property>
+     <addaction name="plan"/>
+     <addaction name="add_plan"/>
+    </widget>
+    <addaction name="login_ID"/>
+    <addaction name="delconfig"/>
+    <addaction name="separator"/>
+    <addaction name="menu_6"/>
+    <addaction name="menu_7"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_5"/>
    <addaction name="menu_4"/>
   </widget>
   <action name="CreateTab">
@@ -148,6 +173,36 @@
   <action name="RemoteScan">
    <property name="text">
     <string>远程扫描</string>
+   </property>
+  </action>
+  <action name="login_ID">
+   <property name="text">
+    <string>登入ID</string>
+   </property>
+  </action>
+  <action name="delconfig">
+   <property name="text">
+    <string>删除设置</string>
+   </property>
+  </action>
+  <action name="report">
+   <property name="text">
+    <string>上报</string>
+   </property>
+  </action>
+  <action name="add_report">
+   <property name="text">
+    <string>添加数据</string>
+   </property>
+  </action>
+  <action name="plan">
+   <property name="text">
+    <string>计算</string>
+   </property>
+  </action>
+  <action name="add_plan">
+   <property name="text">
+    <string>添加数据</string>
    </property>
   </action>
  </widget>
