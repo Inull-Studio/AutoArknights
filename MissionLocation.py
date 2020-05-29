@@ -11,7 +11,6 @@ from cv2 import imread
 logLevel = {10: 'DEBUG', 20: 'INFO',
             30: 'WARNING', 40: 'ERROR', 50: 'CRITICAL'}
 
-
 class M_to_L(object):
     def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget, mission: str = '自己指定关卡'):
         self.mission = mission
@@ -27,33 +26,30 @@ class M_to_L(object):
         self.tap(eq, int(size[0]*(43/48)), int(size[1]*(11/12)))
 
     def sanxing(self, eq, size):
-        system('adb -s '+eq+' shell screencap /sdcard/1.png')
-        system('adb -s '+eq+' pull /sdcard/1.png Data\\three.png 1>nul 2>nul')
+        system('adb -s '+eq+' shell screencap /sdcard/three.png')
+        system('adb -s '+eq+' pull /sdcard/three.png temp_Data\\three.png 1>nul 2>nul')
         system('adb -s '+eq+' shell rm /sdcard/1.png')
-        data = imread('Data\\three.png')
+        data = imread('temp_Data\\three.png')
+        detail_img=data[int(data.shape[0]/(18/11)):]
+        stage_img=rimg[int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
         if data[int(size[1]*(51/72)), int(size[0]*(37/144))][2] == 62:
-            system('del /q Data\\three.png')
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             return 'Yes'
         elif data[int(size[1]*(51/72)), int(size[0]*(37/144))][2] == 74:
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
-            system('del /q Data\\three.png')
             return 'No'
         else:
-            system('del /q Data\\three.png')
             return 'False'
 
     def shengji(self, eq, size):
         sleep(1)
         system('adb -s '+eq+' shell screencap /sdcard/shengji.png')
-        system('adb -s '+eq+' pull /sdcard/shengji.png Data\\shengji.png 1>nul 2>nul')
+        system('adb -s '+eq+' pull /sdcard/shengji.png temp_Data\\shengji.png 1>nul 2>nul')
         system('adb -s '+eq+' shell rm /sdcard/shengji.png')
-        data1 = imread('Data\\shengji.png')
+        data1 = imread('temp_Data\\shengji.png')
         if data1[int(size[1]*0.4), int(size[0]*0.26875)][2] == 1:
             self.setLog(self.mission, logging.INFO, '发生升级')
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
-            system('adb -s '+eq+' shell input tap ' +
-                   str(size[0]*0.3125)+' '+str(size[1]*(5/9)))
             sleep(5)
             return True
         else:
@@ -63,9 +59,9 @@ class M_to_L(object):
         self.setLog(self.mission, logging.INFO, '正在检测是否开启代理')
         sleep(1)
         system('adb -s '+eq+' shell screencap /sdcard/daili.png')
-        system('adb -s '+eq+' pull /sdcard/daili.png Data\\daili.png >nul')
+        system('adb -s '+eq+' pull /sdcard/daili.png temp_Data\\daili.png >nul')
         system('adb -s '+eq+' shell rm /sdcard/daili.png')
-        dailiImg = imread(r'Data\daili.png')
+        dailiImg = imread(r'temp_Data\daili.png')
         if dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
             system('adb -s '+eq+' shell input tap ' +
@@ -83,9 +79,9 @@ class M_to_L(object):
         self.setLog(self.mission, logging.INFO, '正在检测理智')
         sleep(0.5)
         system('adb -s '+eq+' shell screencap /sdcard/lizhi.png')
-        system('adb -s '+eq+' pull /sdcard/lizhi.png Data\\lizhi.png 1>nul 2>nul')
+        system('adb -s '+eq+' pull /sdcard/lizhi.png temp_Data\\lizhi.png 1>nul 2>nul')
         system('adb -s '+eq+' shell rm /sdcard/lizhi.png')
-        lizhiImg = imread('Data\\lizhi.png')
+        lizhiImg = imread('temp_Data\\lizhi.png')
         if lizhiImg[int(size[1]*(5/9)), int(size[0]*(120/144))][2] != 130:
             if self.lizhi['buhuifu']:
                 return 'buhuifu'
@@ -107,10 +103,10 @@ class M_to_L(object):
                            str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
                     system('adb -s '+eq+' shell screencap /sdcard/2.png')
                     system('adb -s '+eq +
-                           ' pull /sdcard/2.png Data\\2.png 1>nul 2>nul')
+                           ' pull /sdcard/2.png temp_Data\\2.png 1>nul 2>nul')
                     system('adb -s '+eq+' shell rm /sdcard/2.png')
                     sleep(1)
-                    shitou = imread('Data\\2.png')
+                    shitou = imread('temp_Data\\2.png')
                     if shitou[int(size[1]*(7/45)), int(size[0]*0.275)][2] == 255:
                         return False
                     return True

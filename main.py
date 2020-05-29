@@ -1,8 +1,9 @@
 import sys
-import winreg
+import winreg,json
 import ctypes,inspect
 from configparser import ConfigParser
 import os
+import shutil,Material
 import LAN
 from MissionLocation import M_to_L
 import re
@@ -15,13 +16,14 @@ import threading
 from subprocess import run, PIPE
 from os import walk, listdir, popen
 from time import sleep, localtime, strftime
-from PyQt5 import sip
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import logging
 from tab import Ui_Form
 from test import Ui_MainWindow
+from Plan import Ui_Dialog as Plan_Dialog
+from Report import Ui_Dialog as Report_Dialog
 
 logLevel = {10: 'DEBUG', 20: 'INFO', 30: 'WARN', 40: 'ERROR', 50: 'CRITICAL'}
 
@@ -35,6 +37,8 @@ class Tab(QWidget, Ui_Form):
         self.xianzhi = 1
         self.selfmission = False
         self.running=None
+        self.running_mission=None
+        self.run_times=0
         self.LiZhi = {'buhuifu': True, 'yaoji': False, 'yuanshi': False}
         self.Screen_size = []
         self.encoding = str(run(['cmd', '/c', 'chcp'], stdout=PIPE).stdout).strip('\'').strip(r'\n\r').split(' ')[-1]
@@ -73,6 +77,8 @@ class Tab(QWidget, Ui_Form):
                 self._async_raise(self.running,SystemExit)
                 self.setLog(self.tabname, logging.INFO,'=====结束运行=====')
                 self.running=None
+                self.run_times=0
+                self.running_mission=None
         except Exception as e:
             self.setLog(self.tabname,logging.WARNING,'进程未结束')
 
@@ -113,12 +119,12 @@ class Tab(QWidget, Ui_Form):
 
     def LoopMission(self, runMission=None, M_location=None):
         three_times = 0
+        self.running_mission=self.MissionTree.currentItem().text(0)
         if self.selfmission and not M_location and runMission:
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
-                runMission.selfMission(self.Eqlist.currentItem().text().split('\t')[
-                                       0], self.Screen_size)
+                runMission.selfMission(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
                 sleep(0.5)
                 lizhi = runMission.checklizhi(
                     self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
@@ -137,7 +143,6 @@ class Tab(QWidget, Ui_Form):
                 while True:
                     if runMission.shengji(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
                         self.setLog(self.tabname, logging.INFO, '检测到升级,正在自动点击')
-                        break
                     three = runMission.sanxing(
                         self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
                     if 'N' in three:
@@ -151,6 +156,8 @@ class Tab(QWidget, Ui_Form):
                         break
                     elif 'Y' in three:
                         self.setLog(self.tabname, logging.INFO, '是三星')
+                        self.run_times+=1
+                        self.save_Mission()
                         sleep(8)
                         break
                     pass
@@ -194,6 +201,8 @@ class Tab(QWidget, Ui_Form):
                         break
                     elif 'Y' in three:
                         self.setLog(self.tabname, logging.INFO, '是三星')
+                        self.run_times+=1
+                        self.save_Mission()
                         sleep(8)
                         break
                     pass
@@ -223,20 +232,19 @@ class Tab(QWidget, Ui_Form):
         Tlist = []
 
         def Connect(port, host='127.0.0.1'):
-            QApplication.processEvents()
             run(['adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
         rhosts = con.get('Nox', 'rhost')
         lports = con.get('Nox', 'portlist')
         if lports:
             for port in eval(lports):
-                t = threading.Thread(target=Connect, args=(port,))
+                t = threading.Thread(target=Connect, args=(port,),daemon=True)
+                QApplication.processEvents()
                 Tlist.append(t)
                 t.start()
-                QApplication.processEvents()
             for t in Tlist:
                 QApplication.processEvents()
                 t.join()
-            for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
+            for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                 QApplication.processEvents()
                 if 'List' in l.split(' '):
                     continue
@@ -262,7 +270,7 @@ class Tab(QWidget, Ui_Form):
                     QApplication.processEvents()
                     t.join()
                     QApplication.processEvents()
-                for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding=self.encoding).stdout.rstrip('\n').split('\n'):
+                for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                     QApplication.processEvents()
                     if 'List' in l.split(' '):
                         continue
@@ -307,6 +315,9 @@ class Tab(QWidget, Ui_Form):
         self.LiZhi['buhuifu'] = False
         self.LiZhi['yuanshi'] = False
         self.setLog(self.tabname, logging.INFO, self.yaoji.text()+' 已选择')
+    def save_Mission(self):
+        if not os.path.isfile(f'Data\\{self.tabname}_{self.running_mission}_{self.run_times}.png'):
+            shutil.copy('temp_Data\\three.png',f'Data\\{self.tabname}_{self.running_mission}_{self.run_times}.png')
 
     def setLog(self, tabname, level, msg):
         logmsg = f'{logLevel[level]} {tabname}.{msg}'
@@ -331,7 +342,16 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.Soft.triggered.connect(self.showSoft)
         self.UnScan.triggered.connect(self.delConfig)
         self.RemoteScan.triggered.connect(self.RS)
+        self.add_plan.triggered.connect(self.append_plan)
 
+    def append_plan(self):
+        self.d=QDialog()
+        item=Plan_Dialog()
+        item.setupUi(self.d)
+        aa=self.d.exec()
+        if aa==QDialog.Accepted:
+            print(item.count.value())
+            print(item.item_name.currentText())
     def RS(self):
         lasthost = []
         lastport = []
@@ -343,12 +363,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 return
             else:
                 if con.get('Nox', 'portlist'):
-                    a = QMessageBox(self)
-                    a.setWindowTitle('是否使用本地端口')
-                    a.setText('检测到本地存在模拟器')
-                    a.setInformativeText(
-                        '是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)')
-                    a.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                    a = QMessageBox(QMessageBox.Question,'是否使用本地端口','检测到本地存在模拟器\n是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)',QMessageBox.Yes | QMessageBox.No)
                     ok = a.exec()
                     if ok == QMessageBox.Yes:
                         portlist = eval(con.get('Nox', 'portlist'))
@@ -538,7 +553,7 @@ Config.ini和软件本身是重要文件，必须存在，如果不存在会报�
         except FileNotFoundError:
             QMessageBox.critical(self, '文件缺失', '缺少关键文件,请验证程序完整性')
         except:
-            QMessageBox.warning(self, '模拟器不存在', '夜神模拟器不存在,在链接内扫描可链接手机/或远程扫描')
+            QMessageBox.warning(self, '模拟器不存在', '夜神模拟器不存在,在链接内刷新设备可连接手机/或点击远程扫描')
 
     def delTab(self):
         self.MainTab.removeTab(self.MainTab.currentIndex())

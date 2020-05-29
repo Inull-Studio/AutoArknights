@@ -1,7 +1,5 @@
-import requests
+import requests,json
 import urllib3
-import cv2
-import numpy as np
 
 urllib3.disable_warnings()
 
@@ -15,6 +13,9 @@ class Penguin(object):
     }
     report_url = 'https://penguin-stats.cn/PenguinStats/api/v2/report'
     plan_url = 'https://planner.penguin-stats.io/plan'
+    ocr_url='https://api.ocr.space/parse/image'
+    Key='d2a5ef2f7188957'
+
 
     def __init__(self, uid=None):
         super(Penguin, self).__init__()
@@ -29,13 +30,12 @@ class Penguin(object):
         }
         self.report_json = {
             'server': 'CN',
-            'source': 'frontend-v2',
             'stageId': '',
-            'version': 'v3.0.1',
             'drops': []
         }
 
     def update_report(self, stageId, drop_type, itemid, quantity):
+        self.report_json['stageId'] = stageId
         self.report_json['drops'].append(
             {
                 'dropType': drop_type,
@@ -43,66 +43,62 @@ class Penguin(object):
                 'quantity': quantity
             }
         )
-        self.report_json['stageId'] = stageId
 
     def report(self):
+        '''汇报数据
+        返回结果 哈希值'''
         r = requests.post(self.report_url, json=self.report_json,
                           headers=self.header, verify=False, cookies=self.cookies)
+        print(r.status_code)
+        # if r.status_code==201:
+        return r.json()['reportHash']
+        # else:
+        #     print('汇报出错')
+
+    def ocr(self,file):
+        pass
 
     def update_id(self, uid):
         self.cookies['userID'] = uid
 
+    def remove_id(self,uid):
+        if uid==self.cookies['userID']:
+            self.cookies['userID']==None
     def update_need(self, name: str, count: int):
+        print('添加需求:{},数量:{}'.format(name, count))
         self.required['required'][name] = count
 
     def remove_need(self, name: str):
         if name in self.required['required']:
             self.required['required'].pop(name)
-        else:
-            pass
 
     def plan(self):
         r = requests.post(self.plan_url, json=self.required,
                           headers=self.header, verify=False, cookies=self.cookies)
         if r.status_code == 200:
-            planner = r.json()
-            return planner
+            return r.json()
         else:
-            pass
+            print('计划出错')
+    @staticmethod
+    def get_all_items():
+        r=requests.get('https://penguin-stats.io/PenguinStats/api/v2/items')
+        result=str(r.json())
+        with open('.Data\\items.json','w',encoding='utf8') as f:
+            f.write(result)
+
 
 
 if __name__ == '__main__':
     p = Penguin()
-    p.update_need('提纯源岩', 8)
-    p.update_id('66068307')
-    data = p.plan()
-    print('预计理智花费:', data['cost'])
-    print('预计获得经验:', data['exp'])
-    print('预计龙门币收入:', data['gold'])
-    print()
-    [print('关卡:', x['stage'], x['count'], '次') for x in data['stages']]
-    print()
-    [print('合成:', x['target'], x['count'], '次') for x in data['syntheses']]
-
-
-# target = cv2.imread("item.png")
-# template = cv2.imread("a.png")
-# theight, twidth = template.shape[:2]
-# result = cv2.matchTemplate(target,template,cv2.TM_SQDIFF_NORMED)
-# cv2.normalize( result, result, 0, 1, cv2.NORM_MINMAX, -1 )
-# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-# #匹配值转换为字符串
-# #对于cv2.TM_SQDIFF及cv2.TM_SQDIFF_NORMED方法min_val越趋近与0匹配度越好，匹配位置取min_loc
-# #对于其他方法max_val越趋近于1匹配度越好，匹配位置取max_loc
-
-# strmin_val = str(min_val)
-# #绘制矩形边框，将匹配区域标注出来
-# #min_loc：矩形定点
-# #(min_loc[0]+twidth,min_loc[1]+theight)：矩形的宽高
-# #(0,0,225)：矩形的边框颜色；2：矩形边框宽度
-# print(min_loc)
-# cv2.rectangle(target,min_loc,(min_loc[0]+twidth,min_loc[1]+theight),(0,0,225),2)
-
-# cv2.imshow("MatchResult----MatchingValue="+strmin_val,target)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
+    # p.update_need('提纯源岩', 8)
+    # p.update_id('66068307')
+    # p.update_report('pro_a_2', 'SPECIAL_DROP', 'ap_supply_lt_010',1)
+    # print(p.report(),'\n')
+    # data = p.plan()
+    # print('预计理智花费:', data['cost'])
+    # print('预计获得经验:', data['exp'])
+    # print('预计龙门币收入:', data['gold'])
+    # print()
+    # [print('运行关卡:', x['stage'], x['count'], '次') for x in data['stages']]
+    # print()
+    # [print('合成:', x['target'], x['count'], '次') for x in data['syntheses']]

@@ -102,7 +102,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_2.menuAction())
         self.menubar.addAction(self.menu_5.menuAction())
         self.menubar.addAction(self.menu_4.menuAction())
-
         self.retranslateUi(MainWindow)
         self.MainTab.setCurrentIndex(-1)
         self.Exit.triggered.connect(MainWindow.close)
