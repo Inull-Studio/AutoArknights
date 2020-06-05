@@ -42,7 +42,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="stage"/>
+       <widget class="QComboBox" name="stage">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -75,7 +87,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="drop_type"/>
+       <widget class="QComboBox" name="drop_type">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -108,7 +126,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="item_ID"/>
+       <widget class="QComboBox" name="item_ID">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -142,6 +166,11 @@
       </item>
       <item>
        <widget class="QSpinBox" name="item_quantity">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>
@@ -163,5 +192,70 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>stage</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>drop_type</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stage</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>item_ID</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>131</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

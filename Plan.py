@@ -8,7 +8,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import json
 
 
 class Ui_Dialog(object):
@@ -42,7 +41,7 @@ class Ui_Dialog(object):
         self.item_name = QtWidgets.QComboBox(self.frame)
         self.item_name.setMinimumSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(15)
         self.item_name.setFont(font)
         self.item_name.setObjectName("item_name")
         self.horizontalLayout.addWidget(self.item_name)
@@ -63,6 +62,9 @@ class Ui_Dialog(object):
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_2.addWidget(self.label_2)
         self.count = QtWidgets.QSpinBox(self.frame_2)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.count.setFont(font)
         self.count.setMinimum(1)
         self.count.setMaximum(9999)
         self.count.setObjectName("count")
@@ -72,11 +74,13 @@ class Ui_Dialog(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout.addWidget(self.buttonBox)
-        f=open('Data\\items.json','r',encoding='utf8')
-        self.item_name.addItems([x['name'] for x in eval(f.read())])
+        f=open(r'.\Data\items.json','r',encoding='utf8')
+        data=f.read()
         f.close()
+        self.item_name.addItems([x['name'] for x in eval(data)])
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.rejected.connect(Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):

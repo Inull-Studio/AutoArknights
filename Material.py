@@ -80,12 +80,25 @@ class Penguin(object):
         else:
             print('计划出错')
     @staticmethod
-    def get_all_items():
+    def down_all_items():
         r=requests.get('https://penguin-stats.io/PenguinStats/api/v2/items')
         result=str(r.json())
         with open('.Data\\items.json','w',encoding='utf8') as f:
             f.write(result)
-
+    @staticmethod
+    def itemid_to_name(id):
+        item=eval(open('.Data\\items.json','r',encoding='utf8').read())
+        itemname=item['']
+    @staticmethod
+    def get_stage_codes():
+        data=json.loads(open(r'.\Data\stage.json','r',encoding='utf8').read())
+        return [x['code'] for x in data]
+    @staticmethod
+    def down_all_stages(server='CN'):
+        r=requests.get('https://penguin-stats.io/PenguinStats/api/v2/stages?server={server}')
+        result=str(r.json())
+        with open(r'.\Data\stage.json','w',encoding='utf8') as f:
+            f.write(result)
 
 
 if __name__ == '__main__':

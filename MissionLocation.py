@@ -14,7 +14,7 @@ logLevel = {10: 'DEBUG', 20: 'INFO',
 class M_to_L(object):
     def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget, mission: str = '自己指定关卡'):
         self.mission = mission
-        self.tap_str = 'adb -s {} shell input tap {} {}'
+        self.tap_str = r'.\Data\tools\adb -s {} shell input tap {} {}'
         self.lizhi = lizhi
         self.loger = loger
         self.logText = logText
@@ -26,9 +26,9 @@ class M_to_L(object):
         self.tap(eq, int(size[0]*(43/48)), int(size[1]*(11/12)))
 
     def sanxing(self, eq, size):
-        system('adb -s '+eq+' shell screencap /sdcard/three.png')
-        system('adb -s '+eq+' pull /sdcard/three.png temp_Data\\three.png 1>nul 2>nul')
-        system('adb -s '+eq+' shell rm /sdcard/1.png')
+        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/three.png')
+        system(r'.\Data\tools\adb -s '+eq+' pull /sdcard/three.png temp_Data\\three.png 1>nul 2>nul')
+        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/1.png')
         data = imread('temp_Data\\three.png')
         detail_img=data[int(data.shape[0]/(18/11)):]
         stage_img=rimg[int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
@@ -43,9 +43,9 @@ class M_to_L(object):
 
     def shengji(self, eq, size):
         sleep(1)
-        system('adb -s '+eq+' shell screencap /sdcard/shengji.png')
-        system('adb -s '+eq+' pull /sdcard/shengji.png temp_Data\\shengji.png 1>nul 2>nul')
-        system('adb -s '+eq+' shell rm /sdcard/shengji.png')
+        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/shengji.png')
+        system(r'.\Data\tools\adb -s '+eq+' pull /sdcard/shengji.png temp_Data\\shengji.png 1>nul 2>nul')
+        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/shengji.png')
         data1 = imread('temp_Data\\shengji.png')
         if data1[int(size[1]*0.4), int(size[0]*0.26875)][2] == 1:
             self.setLog(self.mission, logging.INFO, '发生升级')
@@ -58,13 +58,13 @@ class M_to_L(object):
     def kaiqidaili(self, eq: str, size: list):
         self.setLog(self.mission, logging.INFO, '正在检测是否开启代理')
         sleep(1)
-        system('adb -s '+eq+' shell screencap /sdcard/daili.png')
-        system('adb -s '+eq+' pull /sdcard/daili.png temp_Data\\daili.png >nul')
-        system('adb -s '+eq+' shell rm /sdcard/daili.png')
+        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/daili.png')
+        system(r'.\Data\tools\adb -s '+eq+' pull /sdcard/daili.png temp_Data\\daili.png >nul')
+        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/daili.png')
         dailiImg = imread(r'temp_Data\daili.png')
         if dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.875)+' '+str(size[1]*0.85))
             self.setLog(self.mission, logging.INFO, '代理开启成功')
             system('del /s daili.png>nul')
@@ -78,19 +78,19 @@ class M_to_L(object):
     def checklizhi(self, eq: str, size: list):
         self.setLog(self.mission, logging.INFO, '正在检测理智')
         sleep(0.5)
-        system('adb -s '+eq+' shell screencap /sdcard/lizhi.png')
-        system('adb -s '+eq+' pull /sdcard/lizhi.png temp_Data\\lizhi.png 1>nul 2>nul')
-        system('adb -s '+eq+' shell rm /sdcard/lizhi.png')
+        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/lizhi.png')
+        system(r'.\Data\tools\adb -s '+eq+' pull /sdcard/lizhi.png temp_Data\\lizhi.png 1>nul 2>nul')
+        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/lizhi.png')
         lizhiImg = imread('temp_Data\\lizhi.png')
         if lizhiImg[int(size[1]*(5/9)), int(size[0]*(120/144))][2] != 130:
             if self.lizhi['buhuifu']:
                 return 'buhuifu'
             else:
                 if lizhiImg[int(size[1]*(5/36)), int(size[0]*(75/144))][2] == 255 and self.lizhi['yaoji']:
-                    system('adb -s '+eq+' shell input tap ' +
+                    system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                            str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
                     sleep(1)
-                    system('adb -s '+eq+' shell input tap ' +
+                    system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                            str(size[0]*0.875)+' '+str(size[1]*(8/9)))
                     sleep(2)
                     return False
@@ -99,12 +99,12 @@ class M_to_L(object):
                     sleep(1)
                     return True
                 elif self.lizhi['yuanshi']:
-                    system('adb -s '+eq+' shell input tap ' +
+                    system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                            str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
-                    system('adb -s '+eq+' shell screencap /sdcard/2.png')
-                    system('adb -s '+eq +
+                    system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/2.png')
+                    system(r'.\Data\tools\adb -s '+eq +
                            ' pull /sdcard/2.png temp_Data\\2.png 1>nul 2>nul')
-                    system('adb -s '+eq+' shell rm /sdcard/2.png')
+                    system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/2.png')
                     sleep(1)
                     shitou = imread('temp_Data\\2.png')
                     if shitou[int(size[1]*(7/45)), int(size[0]*0.275)][2] == 255:
@@ -176,13 +176,13 @@ class M_to_L(object):
                datetime.timedelta(hours=4)).strftime('%A')
         size = [int(x) for x in size]
         if now == 'Monday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
             sleep(0.5)
         elif now == 'Tuesday':
@@ -190,13 +190,13 @@ class M_to_L(object):
         elif now == 'Wednesday':
             print('今天是星期三,今天没有凭证')
         elif now == 'Thursday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
             sleep(0.5)
         elif now == 'Firday':
@@ -204,20 +204,20 @@ class M_to_L(object):
         elif now == 'Saturday':
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
             sleep(0.5)
         elif now == 'Sunday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
 
     def CA(self, eq: str, size: list):
@@ -229,45 +229,45 @@ class M_to_L(object):
         elif now == 'Monday':
             print('今天是星期一')
         elif now == 'Tuesday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq + ' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq + ' shell input tap ' +
                    str(size[0]*0.375)+' '+str(size[1]*(5/9)))
             sleep(0.5)
         elif now == 'Wednesday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq + ' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq + ' shell input tap ' +
                    str(size[0]*0.375)+' '+str(size[1]*(5/9)))
             sleep(0.5)
         elif now == 'Thursday':
             print('今天是星期四,今天没有技能书')
         elif now == 'Firday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
             sleep(0.5)
         elif now == 'Sunday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.34375)+' '+str(size[1]*0.5))
             sleep(0.5)
 
@@ -278,44 +278,44 @@ class M_to_L(object):
         if now == 'Monday':
             return None
         elif now == 'Tuesday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.5625)+' '+str(size[1]*(5/9)))
             sleep(0.5)
         elif now == 'Wednesday':
             return None
         elif now == 'Thursday':
-            system(f'adb -s {eq} shell input tap {size[0]*0.75} {size[1]*(2/9)}')
+            system(fr'.\Data\tools\adb -s {eq} shell input tap {size[0]*0.75} {size[1]*(2/9)}')
             sleep(0.5)
-            system(f'adb -s {eq} shell input tap {size[0]*0.1875} {size[1]*(83/90)}')
+            system(fr'.\Data\tools\adb -s {eq} shell input tap {size[0]*0.1875} {size[1]*(83/90)}')
             sleep(0.5)
-            system(f'adb -s {eq} shell input tap {size[0]*0.5625} {size[1]*(5/9)}')
+            system(fr'.\Data\tools\adb -s {eq} shell input tap {size[0]*0.5625} {size[1]*(5/9)}')
             sleep(0.5)
         elif now == 'Friday':
             return None
         elif now == 'Saturday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(4/9)))
             sleep(0.5)
         elif now == 'Sunday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(5/9)))
             sleep(0.5)
 
@@ -329,43 +329,43 @@ class M_to_L(object):
 
     def SK(self, eq: str, size: list):
         if now == 'Monday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.5625)+' '+str(size[1]*(5/9)))
             sleep(0.5)
         elif now == 'Tuesday':
             print('今天是星期二,今天没有')
         elif now == 'Wednesday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.5625)+' '+str(size[1]*(5/9)))
         elif now == 'Thursday':
             print('今天是星期四,今天没有')
         elif now == 'Friday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(83/90)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.5625)+' '+str(size[1]*(5/9)))
             sleep(0.5)
         elif now == 'Saturday':
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.75)+' '+str(size[1]*(2/9)))
             sleep(0.5)
-            system('adb -s '+eq+' shell input tap ' +
+            system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.1875)+' '+str(size[1]*(8/9)))
             sleep(0.5)
             self.tap(eq, int(size[0]*0.5625), int(size[1]*0.3125))
@@ -374,7 +374,7 @@ class M_to_L(object):
             print('今天是星期日,今天没有')
 
     def tap(self, eq: str, x: int, y: int):
-        run(['adb', '-s', eq, 'shell', 'input', 'tap', str(x), str(y)], stdout=PIPE)
+        run(self.tap_str.format(eqstr(x), str(y)), stdout=PIPE)
 
     def AP1(self, eq, size):
         self.AP(eq, size)
@@ -483,7 +483,7 @@ class M_to_L(object):
 
     def LS1(self, eq, size):
         self.LS(eq, size)
-        system('adb -s '+eq+' shell input tap ' +
+        system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                str(size[0]*(5/24))+' '+str(size[1]*(57/72)))
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')
@@ -491,7 +491,7 @@ class M_to_L(object):
 
     def LS2(self, eq, size):
         self.LS(eq, size)
-        system('adb -s '+eq+' shell input tap ' +
+        system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                str(size[0]*(13/36))+' '+str(size[1]*(29/36)))
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')
@@ -499,7 +499,7 @@ class M_to_L(object):
 
     def LS3(self, eq, size):
         self.LS(eq, size)
-        system('adb -s '+eq+' shell input tap ' +
+        system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                str(size[0]*(19/36))+' '+str(size[1]*(5/14)))
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')
@@ -507,7 +507,7 @@ class M_to_L(object):
 
     def LS4(self, eq, size):
         self.LS(eq, size)
-        system('adb -s '+eq+' shell input tap ' +
+        system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                str(size[0]*(47/72))+' '+str(size[1]*(5/12)))
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')
@@ -515,7 +515,7 @@ class M_to_L(object):
 
     def LS5(self, eq, size):
         self.LS(eq, size)
-        system('adb -s '+eq+' shell input tap ' +
+        system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                str(size[0]*0.74375)+' '+str(size[1]*(43/180)))
         if not self.kaiqidaili(eq, size):
             self.setLog(self.mission, logging.WARN, '代理开启失败')

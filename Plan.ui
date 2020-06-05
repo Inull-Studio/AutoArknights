@@ -99,7 +99,7 @@
         </property>
         <property name="font">
          <font>
-          <pointsize>10</pointsize>
+          <pointsize>15</pointsize>
          </font>
         </property>
        </widget>
@@ -151,6 +151,11 @@
       </item>
       <item>
        <widget class="QSpinBox" name="count">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
         <property name="minimum">
          <number>1</number>
         </property>

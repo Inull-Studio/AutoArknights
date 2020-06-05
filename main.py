@@ -1,5 +1,5 @@
 import sys
-import winreg,json
+import winreg,json,win32gui,win32api
 import ctypes,inspect
 from configparser import ConfigParser
 import os
@@ -37,11 +37,11 @@ class Tab(QWidget, Ui_Form):
         self.xianzhi = 1
         self.selfmission = False
         self.running=None
+        self.device_name=''
         self.running_mission=None
         self.run_times=0
         self.LiZhi = {'buhuifu': True, 'yaoji': False, 'yuanshi': False}
         self.Screen_size = []
-        self.encoding = str(run(['cmd', '/c', 'chcp'], stdout=PIPE).stdout).strip('\'').strip(r'\n\r').split(' ')[-1]
         self.tabname = tabname
         self.loger = logging.getLogger(tabname)
         self.loger.setLevel(logging.DEBUG)
@@ -56,12 +56,24 @@ class Tab(QWidget, Ui_Form):
         self.Eqlist.itemClicked.connect(lambda: threading.Thread(
             target=self.Eq_clicked, daemon=True).start())
         self.RefreshBtn.clicked.connect(lambda: threading.Thread(
-            target=self.testEq, daemon=True).start())
+            target=self.testEq).start())
         self.RunBtn.clicked.connect(self.Run_clicked)
         self.EndButon.clicked.connect(self.KillRun)
         self.Times.valueChanged.connect(self.xianzhiTimes)
         self.threeTimes.valueChanged.connect(self.showThreeTimes)
+        self.disp_btn.clicked.connect(self.disp)
 
+    def disp(self):
+        if not self.device_name:
+            self.setLog(self.tabname,logging.WARNING,'未选择设备')
+            return
+        hwnd=win32gui.FindWindow('SDL_app',self.device_name)
+        if hwnd!=0:
+            self.setLog(self.tabname,logging.INFO,'正在显示,不能重复显示')
+            win32gui.SetForegroundWindow(hwnd)
+            win32gui.ShowWindow(hwnd,1)
+            return
+        win32api.ShellExecute(0, None, r'.\Data\tools\scrcpy-noconsole','-n', None, 1)
     def showThreeTimes(self):
         self.setLog(self.tabname, logging.INFO,
                     '设置限制三星次数为{}'.format(self.threeTimes.value()))
@@ -79,7 +91,7 @@ class Tab(QWidget, Ui_Form):
                 self.running=None
                 self.run_times=0
                 self.running_mission=None
-        except Exception as e:
+        except:
             self.setLog(self.tabname,logging.WARNING,'进程未结束')
 
     def _async_raise(self,thread, exctype):
@@ -119,8 +131,8 @@ class Tab(QWidget, Ui_Form):
 
     def LoopMission(self, runMission=None, M_location=None):
         three_times = 0
-        self.running_mission=self.MissionTree.currentItem().text(0)
         if self.selfmission and not M_location and runMission:
+            self.running_mission='self'
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
@@ -136,7 +148,7 @@ class Tab(QWidget, Ui_Form):
                                 '不自动恢复理智,停止自动刷=============')
                     return
 
-                run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
+                run([r'.\Data\tools\adb', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
                 self.setLog(self.tabname, logging.INFO,
                             '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
@@ -162,6 +174,7 @@ class Tab(QWidget, Ui_Form):
                         break
                     pass
         else:
+            self.running_mission=self.MissionTree.currentItem().text()
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
@@ -179,7 +192,7 @@ class Tab(QWidget, Ui_Form):
                     return
                 else:
                     return
-                run(['adb.exe', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',
+                run([r'.\Data\tools\adb', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',
                      str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
                 self.setLog(self.tabname, logging.INFO,
                             '进入关卡,60秒后循环检测运行状态')
@@ -210,15 +223,13 @@ class Tab(QWidget, Ui_Form):
 
     def Eq_clicked(self):
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
-        self.Screen_size = [int(x) for x in run(['adb.exe', '-s', '{}'.format(self.Eqlist.currentItem().text().split('\t')[0]),
-                                                 'shell', 'wm', 'size'], stdout=PIPE, encoding=self.encoding).stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.Eqlist.currentItem().text().split('\t')[0]),'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        self.device_name=popen(r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(self.Eqlist.currentItem().text().split('\t')[0])).read().strip('\n')
         if not self.Screen_size[0]:
-            self.setLog(self.tabname, logging.INFO, self.Eqlist.currentItem(
-            ).text().split('\t')[0]+' 未知错误,设备无法连接')
+            self.setLog(self.tabname, logging.INFO, self.Eqlist.currentItem().text().split('\t')[0]+' 未知错误,设备无法连接')
             self.Screen_size = []
             return
-        self.setLog(self.tabname, logging.INFO,
-                    self.Eqlist.currentItem().text().split('\t')[0]+' 已选择')
+        self.setLog(self.tabname, logging.INFO,self.Eqlist.currentItem().text().split('\t')[0]+' 已选择')
 
     def Mission_clicked(self):
         self.setLog(self.tabname, logging.INFO,
@@ -227,25 +238,17 @@ class Tab(QWidget, Ui_Form):
     def testEq(self):
         self.Eqlist.clear()
         eq_list = []
-        self.setLog(self.tabname, logging.INFO,
-                    self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
-        Tlist = []
-
+        Tlist=[]
+        self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
         def Connect(port, host='127.0.0.1'):
-            run(['adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
+            run([r'.\Data\tools\adb.exe', 'connect', f'{host}:{port}'], stdout=PIPE)
         rhosts = con.get('Nox', 'rhost')
         lports = con.get('Nox', 'portlist')
         if lports:
             for port in eval(lports):
                 t = threading.Thread(target=Connect, args=(port,),daemon=True)
-                QApplication.processEvents()
-                Tlist.append(t)
                 t.start()
-            for t in Tlist:
-                QApplication.processEvents()
-                t.join()
-            for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
-                QApplication.processEvents()
+            for l in run([r'.\Data\tools\adb', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                 if 'List' in l.split(' '):
                     continue
                 if 'offline' in l:
@@ -255,6 +258,11 @@ class Tab(QWidget, Ui_Form):
                     eq_list.append(b+'\t模拟器')
                 else:
                     eq_list.append(b+'\t手机')
+            eq_list=list(set(eq_list))
+            if not eq_list:
+                self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+            else:
+                self.Eqlist.addItems(eq_list)
         else:
             self.setLog(self.tabname, logging.WARNING, '本地未有设备(未扫描本地模拟器)')
         if rhosts:
@@ -262,16 +270,9 @@ class Tab(QWidget, Ui_Form):
             if rports:
                 for port in eval(rports):
                     for host in eval(rhosts):
-                        t = threading.Thread(target=Connect, args=(port, host))
-                        Tlist.append(t)
+                        t = threading.Thread(target=Connect, args=(port, host),daemon=True)
                         t.start()
-                        QApplication.processEvents()
-                for t in Tlist:
-                    QApplication.processEvents()
-                    t.join()
-                    QApplication.processEvents()
-                for l in run(['adb.exe', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
-                    QApplication.processEvents()
+                for l in run([r'.\Data\tools\adb', 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                     if 'List' in l.split(' '):
                         continue
                     if 'offline' in l:
@@ -286,17 +287,15 @@ class Tab(QWidget, Ui_Form):
                                 eq_list.append(b+'\t模拟器')
                             else:
                                 eq_list.append(b+'\t手机')
-                self.setLog(self.tabname, logging.INFO,
-                            self.Eqlist.objectName()+' 测试完成')
                 eq_list = list(set(eq_list))
                 if not eq_list:
-                    self.setLog(self.tabname, logging.INFO,
-                                self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+                    self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
                 else:
                     self.Eqlist.addItems(eq_list)
             else:
                 self.setLog(self.tabname, logging.WARNING, '远程地址未有设备(未扫远程描模)')
                 return
+        self.setLog(self.tabname, logging.INFO,self.Eqlist.objectName()+' 测试完成')
 
     def buhuifu_clicked(self):
         self.LiZhi['buhuifu'] = True
@@ -343,13 +342,28 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.UnScan.triggered.connect(self.delConfig)
         self.RemoteScan.triggered.connect(self.RS)
         self.add_plan.triggered.connect(self.append_plan)
+        self.add_report.triggered.connect(self.append_report)
+
+    def append_report(self):
+        self.rd=QDialog()
+        stage=Report_Dialog()
+        data=eval(open(r'.\Data\stage.json','r',encoding='utf8').read())
+        data=json.loads(data)
+        stage.stage.addItems(Material.Penguin.get_stage_codes(data))
+        stage.setupUi(self.rd)
+        ok=self.rd.exec()
+        if ok==QDialog.Accepted:
+            print(stage.stage.currentText())
+            print(stage.drop_type.currentText())
+            print(stage.item_ID.currentText())
+            print(stage.item_quantity.value())
 
     def append_plan(self):
-        self.d=QDialog()
+        self.pd=QDialog()
         item=Plan_Dialog()
-        item.setupUi(self.d)
-        aa=self.d.exec()
-        if aa==QDialog.Accepted:
+        item.setupUi(self.pd)
+        ok=self.pd.exec()
+        if ok==QDialog.Accepted:
             print(item.count.value())
             print(item.item_name.currentText())
     def RS(self):
@@ -574,17 +588,15 @@ Config.ini和软件本身是重要文件，必须存在，如果不存在会报�
 if __name__ == '__main__':
     try:
         os.chdir(popen('cd').read().strip('\n'))
-        popen('adb nodaemon server')
         app = QApplication(sys.argv)
         win = MainWin()
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                             r'Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched')
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,r'Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched')
         if not os.path.exists('config.ini'):
             raise FileNotFoundError
         con = ConfigParser()
         con.read('config.ini', encoding='utf8')
         threading.Thread(target=win.show(), daemon=True).start()
-        sys.exit(app.exec_())
+        sys.exit(app.exec())
     except FileNotFoundError:
         QMessageBox.critical(win, '错误', '未找到config.ini\n请验证文件完整性')
         sys.exit(2)
