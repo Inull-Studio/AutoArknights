@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>添加汇报</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -121,12 +121,12 @@
          </font>
         </property>
         <property name="text">
-         <string>物品ID</string>
+         <string>物品名称</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="item_ID">
+       <widget class="QComboBox" name="item_name">
         <property name="font">
          <font>
           <pointsize>15</pointsize>
@@ -193,38 +193,6 @@
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>stage</sender>
-   <signal>currentTextChanged(QString)</signal>
-   <receiver>drop_type</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>224</x>
-     <y>33</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>224</x>
-     <y>89</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>stage</sender>
-   <signal>currentTextChanged(QString)</signal>
-   <receiver>item_ID</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>224</x>
-     <y>33</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>224</x>
-     <y>144</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>

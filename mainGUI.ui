@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AutoArknight v1.3.0</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="MainTab">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>500</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>菜单</string>
+    </property>
+    <addaction name="CreateTab"/>
+    <addaction name="DeleteTab"/>
+    <addaction name="separator"/>
+    <addaction name="Exit"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>设备</string>
+    </property>
+    <addaction name="Scan"/>
+    <addaction name="RemoteScan"/>
+    <addaction name="UnScan"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="DeleteAllLog"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>关于</string>
+    </property>
+    <addaction name="Soft"/>
+    <addaction name="Author"/>
+    <addaction name="Help"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>企鹅物流数据统计</string>
+    </property>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>上报数据</string>
+     </property>
+     <addaction name="report"/>
+     <addaction name="add_report"/>
+     <addaction name="del_report"/>
+    </widget>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>计算规划</string>
+     </property>
+     <addaction name="plan"/>
+     <addaction name="add_plan"/>
+     <addaction name="del_plan"/>
+    </widget>
+    <addaction name="login_ID"/>
+    <addaction name="delconfig"/>
+    <addaction name="separator"/>
+    <addaction name="menu_6"/>
+    <addaction name="menu_7"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_3"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_5"/>
+   <addaction name="menu_4"/>
+  </widget>
+  <action name="CreateTab">
+   <property name="text">
+    <string>新建</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="DeleteTab">
+   <property name="text">
+    <string>删除</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="Exit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="Scan">
+   <property name="text">
+    <string>扫描本地模拟器</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="DeleteAllLog">
+   <property name="text">
+    <string>删除所有日志文件</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="Soft">
+   <property name="text">
+    <string>关于软件</string>
+   </property>
+  </action>
+  <action name="Author">
+   <property name="text">
+    <string>关于作者</string>
+   </property>
+  </action>
+  <action name="Help">
+   <property name="text">
+    <string>帮助</string>
+   </property>
+  </action>
+  <action name="UnScan">
+   <property name="text">
+    <string>删除扫描结果</string>
+   </property>
+  </action>
+  <action name="RemoteScan">
+   <property name="text">
+    <string>远程扫描</string>
+   </property>
+  </action>
+  <action name="login_ID">
+   <property name="text">
+    <string>登入ID</string>
+   </property>
+  </action>
+  <action name="delconfig">
+   <property name="text">
+    <string>删除设置</string>
+   </property>
+  </action>
+  <action name="report">
+   <property name="text">
+    <string>上报</string>
+   </property>
+  </action>
+  <action name="add_report">
+   <property name="text">
+    <string>添加数据</string>
+   </property>
+  </action>
+  <action name="plan">
+   <property name="text">
+    <string>计算</string>
+   </property>
+  </action>
+  <action name="add_plan">
+   <property name="text">
+    <string>添加数据</string>
+   </property>
+  </action>
+  <action name="del_report">
+   <property name="text">
+    <string>删除数据</string>
+   </property>
+  </action>
+  <action name="del_plan">
+   <property name="text">
+    <string>删除数据</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>Exit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>234</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

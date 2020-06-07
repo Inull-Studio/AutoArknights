@@ -21,7 +21,8 @@ class Ui_Form(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
         self.groupBox.setMaximumSize(QtCore.QSize(16777215, 200))
-        self.groupBox.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.groupBox.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.groupBox.setObjectName("groupBox")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout.setSizeConstraint(QtWidgets.QLayout.SetNoConstraint)
@@ -31,18 +32,22 @@ class Ui_Form(object):
         self.device.setMinimumSize(QtCore.QSize(0, 0))
         self.device.setMaximumSize(QtCore.QSize(200, 16777215))
         self.device.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.device.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.device.setAlignment(
+            QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.device.setObjectName("device")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.device)
-        self.verticalLayout_4.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
+        self.verticalLayout_4.setSizeConstraint(
+            QtWidgets.QLayout.SetMinAndMaxSize)
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.Eqlist = QtWidgets.QListWidget(self.device)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Eqlist.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.Eqlist.sizePolicy().hasHeightForWidth())
         self.Eqlist.setSizePolicy(sizePolicy)
         self.Eqlist.setMinimumSize(QtCore.QSize(0, 70))
         self.Eqlist.setMaximumSize(QtCore.QSize(300, 200))
@@ -52,13 +57,17 @@ class Ui_Form(object):
         self.Eqlist.setMidLineWidth(0)
         self.Eqlist.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.Eqlist.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.Eqlist.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
+        self.Eqlist.setSizeAdjustPolicy(
+            QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.Eqlist.setAutoScrollMargin(1)
         self.Eqlist.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.Eqlist.setTabKeyNavigation(True)
-        self.Eqlist.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.Eqlist.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
-        self.Eqlist.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollPerItem)
+        self.Eqlist.setSelectionMode(
+            QtWidgets.QAbstractItemView.SingleSelection)
+        self.Eqlist.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectItems)
+        self.Eqlist.setHorizontalScrollMode(
+            QtWidgets.QAbstractItemView.ScrollPerItem)
         self.Eqlist.setMovement(QtWidgets.QListView.Static)
         self.Eqlist.setFlow(QtWidgets.QListView.TopToBottom)
         self.Eqlist.setProperty("isWrapping", False)
@@ -77,7 +86,8 @@ class Ui_Form(object):
         self.LiZhi = QtWidgets.QGroupBox(self.groupBox)
         self.LiZhi.setObjectName("LiZhi")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.LiZhi)
-        self.verticalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
+        self.verticalLayout_2.setSizeConstraint(
+            QtWidgets.QLayout.SetDefaultConstraint)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -253,7 +263,8 @@ class Ui_Form(object):
         font.setPointSize(10)
         self.LogText.setFont(font)
         self.LogText.setReadOnly(True)
-        self.LogText.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.LogText.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard | QtCore.Qt.LinksAccessibleByMouse |
+                                             QtCore.Qt.TextBrowserInteraction | QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
         self.LogText.setOpenExternalLinks(True)
         self.LogText.setObjectName("LogText")
         self.verticalLayout_3.addWidget(self.LogText)
@@ -324,49 +335,91 @@ class Ui_Form(object):
         __sortingEnabled = self.MissionTree.isSortingEnabled()
         self.MissionTree.setSortingEnabled(False)
         self.MissionTree.topLevelItem(0).setText(0, _translate("Form", "材料本"))
-        self.MissionTree.topLevelItem(0).child(0).setText(0, _translate("Form", "龙门币"))
-        self.MissionTree.topLevelItem(0).child(0).child(0).setText(0, _translate("Form", "CE-1"))
-        self.MissionTree.topLevelItem(0).child(0).child(1).setText(0, _translate("Form", "CE-2"))
-        self.MissionTree.topLevelItem(0).child(0).child(2).setText(0, _translate("Form", "CE-3"))
-        self.MissionTree.topLevelItem(0).child(0).child(3).setText(0, _translate("Form", "CE-4"))
-        self.MissionTree.topLevelItem(0).child(0).child(4).setText(0, _translate("Form", "CE-5"))
-        self.MissionTree.topLevelItem(0).child(1).setText(0, _translate("Form", "经验本"))
-        self.MissionTree.topLevelItem(0).child(1).child(0).setText(0, _translate("Form", "LS-1"))
-        self.MissionTree.topLevelItem(0).child(1).child(1).setText(0, _translate("Form", "LS-2"))
-        self.MissionTree.topLevelItem(0).child(1).child(2).setText(0, _translate("Form", "LS-3"))
-        self.MissionTree.topLevelItem(0).child(1).child(3).setText(0, _translate("Form", "LS-4"))
-        self.MissionTree.topLevelItem(0).child(1).child(4).setText(0, _translate("Form", "LS-5"))
-        self.MissionTree.topLevelItem(0).child(2).setText(0, _translate("Form", "碳素组"))
-        self.MissionTree.topLevelItem(0).child(2).child(0).setText(0, _translate("Form", "SK-1"))
-        self.MissionTree.topLevelItem(0).child(2).child(1).setText(0, _translate("Form", "SK-2"))
-        self.MissionTree.topLevelItem(0).child(2).child(2).setText(0, _translate("Form", "SK-3"))
-        self.MissionTree.topLevelItem(0).child(2).child(3).setText(0, _translate("Form", "SK-4"))
-        self.MissionTree.topLevelItem(0).child(2).child(4).setText(0, _translate("Form", "SK-5"))
-        self.MissionTree.topLevelItem(0).child(3).setText(0, _translate("Form", "技能书"))
-        self.MissionTree.topLevelItem(0).child(3).child(0).setText(0, _translate("Form", "CA-1"))
-        self.MissionTree.topLevelItem(0).child(3).child(1).setText(0, _translate("Form", "CA-2"))
-        self.MissionTree.topLevelItem(0).child(3).child(2).setText(0, _translate("Form", "CA-3"))
-        self.MissionTree.topLevelItem(0).child(3).child(3).setText(0, _translate("Form", "CA-4"))
-        self.MissionTree.topLevelItem(0).child(3).child(4).setText(0, _translate("Form", "CA-5"))
-        self.MissionTree.topLevelItem(0).child(4).setText(0, _translate("Form", "采购证"))
-        self.MissionTree.topLevelItem(0).child(4).child(0).setText(0, _translate("Form", "AP-1"))
-        self.MissionTree.topLevelItem(0).child(4).child(1).setText(0, _translate("Form", "AP-2"))
-        self.MissionTree.topLevelItem(0).child(4).child(2).setText(0, _translate("Form", "AP-3"))
-        self.MissionTree.topLevelItem(0).child(4).child(3).setText(0, _translate("Form", "AP-4"))
-        self.MissionTree.topLevelItem(0).child(4).child(4).setText(0, _translate("Form", "AP-5"))
+        self.MissionTree.topLevelItem(0).child(
+            0).setText(0, _translate("Form", "龙门币"))
+        self.MissionTree.topLevelItem(0).child(0).child(
+            0).setText(0, _translate("Form", "CE-1"))
+        self.MissionTree.topLevelItem(0).child(0).child(
+            1).setText(0, _translate("Form", "CE-2"))
+        self.MissionTree.topLevelItem(0).child(0).child(
+            2).setText(0, _translate("Form", "CE-3"))
+        self.MissionTree.topLevelItem(0).child(0).child(
+            3).setText(0, _translate("Form", "CE-4"))
+        self.MissionTree.topLevelItem(0).child(0).child(
+            4).setText(0, _translate("Form", "CE-5"))
+        self.MissionTree.topLevelItem(0).child(
+            1).setText(0, _translate("Form", "经验本"))
+        self.MissionTree.topLevelItem(0).child(1).child(
+            0).setText(0, _translate("Form", "LS-1"))
+        self.MissionTree.topLevelItem(0).child(1).child(
+            1).setText(0, _translate("Form", "LS-2"))
+        self.MissionTree.topLevelItem(0).child(1).child(
+            2).setText(0, _translate("Form", "LS-3"))
+        self.MissionTree.topLevelItem(0).child(1).child(
+            3).setText(0, _translate("Form", "LS-4"))
+        self.MissionTree.topLevelItem(0).child(1).child(
+            4).setText(0, _translate("Form", "LS-5"))
+        self.MissionTree.topLevelItem(0).child(
+            2).setText(0, _translate("Form", "碳素组"))
+        self.MissionTree.topLevelItem(0).child(2).child(
+            0).setText(0, _translate("Form", "SK-1"))
+        self.MissionTree.topLevelItem(0).child(2).child(
+            1).setText(0, _translate("Form", "SK-2"))
+        self.MissionTree.topLevelItem(0).child(2).child(
+            2).setText(0, _translate("Form", "SK-3"))
+        self.MissionTree.topLevelItem(0).child(2).child(
+            3).setText(0, _translate("Form", "SK-4"))
+        self.MissionTree.topLevelItem(0).child(2).child(
+            4).setText(0, _translate("Form", "SK-5"))
+        self.MissionTree.topLevelItem(0).child(
+            3).setText(0, _translate("Form", "技能书"))
+        self.MissionTree.topLevelItem(0).child(3).child(
+            0).setText(0, _translate("Form", "CA-1"))
+        self.MissionTree.topLevelItem(0).child(3).child(
+            1).setText(0, _translate("Form", "CA-2"))
+        self.MissionTree.topLevelItem(0).child(3).child(
+            2).setText(0, _translate("Form", "CA-3"))
+        self.MissionTree.topLevelItem(0).child(3).child(
+            3).setText(0, _translate("Form", "CA-4"))
+        self.MissionTree.topLevelItem(0).child(3).child(
+            4).setText(0, _translate("Form", "CA-5"))
+        self.MissionTree.topLevelItem(0).child(
+            4).setText(0, _translate("Form", "采购证"))
+        self.MissionTree.topLevelItem(0).child(4).child(
+            0).setText(0, _translate("Form", "AP-1"))
+        self.MissionTree.topLevelItem(0).child(4).child(
+            1).setText(0, _translate("Form", "AP-2"))
+        self.MissionTree.topLevelItem(0).child(4).child(
+            2).setText(0, _translate("Form", "AP-3"))
+        self.MissionTree.topLevelItem(0).child(4).child(
+            3).setText(0, _translate("Form", "AP-4"))
+        self.MissionTree.topLevelItem(0).child(4).child(
+            4).setText(0, _translate("Form", "AP-5"))
         self.MissionTree.topLevelItem(1).setText(0, _translate("Form", "精英"))
-        self.MissionTree.topLevelItem(1).child(0).setText(0, _translate("Form", "医疗/重装"))
-        self.MissionTree.topLevelItem(1).child(0).child(0).setText(0, _translate("Form", "PR-A-1"))
-        self.MissionTree.topLevelItem(1).child(0).child(1).setText(0, _translate("Form", "PR-A-2"))
-        self.MissionTree.topLevelItem(1).child(1).setText(0, _translate("Form", "术士/狙击"))
-        self.MissionTree.topLevelItem(1).child(1).child(0).setText(0, _translate("Form", "PR-B-1"))
-        self.MissionTree.topLevelItem(1).child(1).child(1).setText(0, _translate("Form", "PR-B-2"))
-        self.MissionTree.topLevelItem(1).child(2).setText(0, _translate("Form", "先锋/辅助"))
-        self.MissionTree.topLevelItem(1).child(2).child(0).setText(0, _translate("Form", "PR-C-1"))
-        self.MissionTree.topLevelItem(1).child(2).child(1).setText(0, _translate("Form", "PR-C-2"))
-        self.MissionTree.topLevelItem(1).child(3).setText(0, _translate("Form", "近卫/特种"))
-        self.MissionTree.topLevelItem(1).child(3).child(0).setText(0, _translate("Form", "PR-D-1"))
-        self.MissionTree.topLevelItem(1).child(3).child(1).setText(0, _translate("Form", "PR-D-2"))
+        self.MissionTree.topLevelItem(1).child(
+            0).setText(0, _translate("Form", "医疗/重装"))
+        self.MissionTree.topLevelItem(1).child(0).child(
+            0).setText(0, _translate("Form", "PR-A-1"))
+        self.MissionTree.topLevelItem(1).child(0).child(
+            1).setText(0, _translate("Form", "PR-A-2"))
+        self.MissionTree.topLevelItem(1).child(
+            1).setText(0, _translate("Form", "术士/狙击"))
+        self.MissionTree.topLevelItem(1).child(1).child(
+            0).setText(0, _translate("Form", "PR-B-1"))
+        self.MissionTree.topLevelItem(1).child(1).child(
+            1).setText(0, _translate("Form", "PR-B-2"))
+        self.MissionTree.topLevelItem(1).child(
+            2).setText(0, _translate("Form", "先锋/辅助"))
+        self.MissionTree.topLevelItem(1).child(2).child(
+            0).setText(0, _translate("Form", "PR-C-1"))
+        self.MissionTree.topLevelItem(1).child(2).child(
+            1).setText(0, _translate("Form", "PR-C-2"))
+        self.MissionTree.topLevelItem(1).child(
+            3).setText(0, _translate("Form", "近卫/特种"))
+        self.MissionTree.topLevelItem(1).child(3).child(
+            0).setText(0, _translate("Form", "PR-D-1"))
+        self.MissionTree.topLevelItem(1).child(3).child(
+            1).setText(0, _translate("Form", "PR-D-2"))
         self.MissionTree.setSortingEnabled(__sortingEnabled)
         self.SelfMission.setText(_translate("Form", "自己指定当前关卡"))
         self.groupBox_3.setTitle(_translate("Form", "高级设置"))

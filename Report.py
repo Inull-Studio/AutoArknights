@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import json
+from Material import Penguin
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -37,26 +38,6 @@ class Ui_Dialog(object):
         self.stage.setObjectName("stage")
         self.horizontalLayout_4.addWidget(self.stage)
         self.verticalLayout.addWidget(self.frame_4)
-        self.frame = QtWidgets.QFrame(Dialog)
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.label_2 = QtWidgets.QLabel(self.frame)
-        self.label_2.setMaximumSize(QtCore.QSize(90, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout_2.addWidget(self.label_2)
-        self.item_ID = QtWidgets.QComboBox(self.frame)
-        font = QtGui.QFont()
-        font.setPointSize(15)
-        self.item_ID.setFont(font)
-        self.item_ID.setObjectName("item_ID")
-        self.horizontalLayout_2.addWidget(self.item_ID)
-        self.verticalLayout.addWidget(self.frame)
         self.frame_2 = QtWidgets.QFrame(Dialog)
         self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -77,6 +58,26 @@ class Ui_Dialog(object):
         self.drop_type.setObjectName("drop_type")
         self.horizontalLayout.addWidget(self.drop_type)
         self.verticalLayout.addWidget(self.frame_2)
+        self.frame = QtWidgets.QFrame(Dialog)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.label_2 = QtWidgets.QLabel(self.frame)
+        self.label_2.setMaximumSize(QtCore.QSize(90, 16777215))
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout_2.addWidget(self.label_2)
+        self.item_name = QtWidgets.QComboBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        self.item_name.setFont(font)
+        self.item_name.setObjectName("item_name")
+        self.horizontalLayout_2.addWidget(self.item_name)
+        self.verticalLayout.addWidget(self.frame)
         self.frame_3 = QtWidgets.QFrame(Dialog)
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -100,22 +101,29 @@ class Ui_Dialog(object):
         self.horizontalLayout_3.addWidget(self.item_quantity)
         self.verticalLayout.addWidget(self.frame_3)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout.addWidget(self.buttonBox)
-
-        self.retranslateUi(Dialog)
-        self.stage.currentTextChanged['QString'].connect(self.drop_type.clear)
-        self.stage.currentTextChanged['QString'].connect(self.item_ID.clear)
+        self.stage.addItems(Penguin.get_stage_code())
+        self.stage.activated.connect(self.drop_type.clear)
+        self.stage.activated.connect(self.item_name.clear)
+        self.stage.activated.connect(lambda: self.drop_type.addItems(
+            [Penguin.droptype_to_CN(x) for x in Penguin.get_droptype(self.stage.currentText())]))
         self.buttonBox.accepted.connect(Dialog.accept)
         self.buttonBox.rejected.connect(Dialog.reject)
-        self.item_ID.currentTextChanged['QString'].connect(self.drop_type.clear)
+        self.drop_type.activated.connect(self.item_name.clear)
+        self.drop_type.activated.connect(lambda: self.item_name.addItems([Penguin.itemid_to_name(
+            x) for x in Penguin.get_stage_itemId_by_droptype(self.stage.currentText(), Penguin.droptype_to_EN(self.drop_type.currentText()))]))
+        self.retranslateUi(Dialog)
+        self.buttonBox.accepted.connect(Dialog.accept)
+        self.buttonBox.rejected.connect(Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "添加汇报"))
         self.label_4.setText(_translate("Dialog", "关卡"))
-        self.label_2.setText(_translate("Dialog", "物品ID"))
         self.label.setText(_translate("Dialog", "掉落类型"))
+        self.label_2.setText(_translate("Dialog", "物品名称"))
         self.label_3.setText(_translate("Dialog", "数量"))
