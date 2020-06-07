@@ -32,6 +32,7 @@ from Plan import Ui_Dialog as Plan_Dialog
 from Report import Ui_Dialog as Report_Dialog
 from plan_option import Ui_Dialog as PlanOption_Dialog
 from R_Plan import Ui_Dialog as Rp_Dialog
+from R_Report import Ui_Dialog as Rr_Dialog
 
 logLevel = {10: 'DEBUG', 20: 'INFO', 30: 'WARN', 40: 'ERROR', 50: 'CRITICAL'}
 
@@ -373,25 +374,87 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.Soft.triggered.connect(self.showSoft)
         self.UnScan.triggered.connect(self.delConfig)
         self.RemoteScan.triggered.connect(self.RS)
+        self.login_ID.triggered.connect(self.login)
         self.add_plan.triggered.connect(self.append_plan)
         self.add_report.triggered.connect(self.append_report)
         self.plan.triggered.connect(self.run_plan)
         self.del_plan.triggered.connect(self.remove_plan)
+        self.del_report.triggered.connect(self.remove_report)
+        self.report.triggered.connect(self.run_report)
+
+    def login(self):
+        userid, ok = QInputDialog.getText(self, '请输入ID', '请输入登入ID')
+        if ok:
+            if not userid:
+                QMessageBox.critical(self, '错误', '未输入ID')
+                return
+            self.p.update_id(userid)
+            QMessageBox.information(self, '登入成功', '已登入ID:'+userid)
+
+    def remove_report(self):
+        while True:
+            try:
+                rrd = QDialog()
+                rp = Rr_Dialog()
+                rp.setupUi(rrd)
+                ok = rrd.exec()
+                if ok == QDialog.Accepted:
+                    if not rp.items.currentItem():
+                        self.p.remove_report(stage=rp.stage.text())
+                        QMessageBox.information(self, '成功', '已删除选择关卡')
+                        return
+                    else:
+                        self.p.remove_report()
+                        self.p.remove_report(
+                            itemid=rp.items.currentItem().text())
+                        QMessageBox.information(
+                            self, '成功', f'已删除{rp.items.currentItem().text()}')
+                else:
+                    break
+            except AttributeError:
+                QMessageBox.critical(self, '错误', '没有掉落物')
+                return
+            except FileNotFoundError:
+                QMessageBox.critical(self, '错误', '未添加过数据')
+                return
+
+    def run_report(self):
+        ask = QMessageBox(QMessageBox.Warning, '警告',
+                          '<h1>请确认提交数据属实，否则可能会被判为异常处理</h1>', QMessageBox.Yes | QMessageBox.No)
+        ok = ask.exec()
+        if ok == QMessageBox.Yes:
+            Hash = self.p.report()
+            if 'userID' in Hash:
+                QMessageBox.critical(self, '错误', '未登入ID')
+                return
+            if 'drops' in Hash:
+                QMessageBox.critical(self, '错误', '未添加数据')
+                return
+            if Hash:
+                QMessageBox.information(
+                    self, '成功', '汇报成功,数据已清空\n汇报Hash已存放在Data\\report文件夹中，需要手动清理')
+                with open(r'.\Data\report\{} report.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
+                    f.write(Hash)
 
     def remove_plan(self):
-        try:
-            rpd = QDialog()
-            name = Rp_Dialog()
-            name.setupUi(rpd)
-            ok = rpd.exec()
-            if ok == QDialog.Accepted:
-                self.p.remove_need(name.names.currentItem().text())
-                QMessageBox.information(
-                    self, '成功', f'已删除{name.names.currentItem().text()}')
-        except AttributeError:
-            QMessageBox.critical(self, '错误', '没有物品')
-        except FileNotFoundError:
-            QMessageBox.critical(self, '错误', '未添加过数据')
+        while True:
+            try:
+                rpd = QDialog()
+                name = Rp_Dialog()
+                name.setupUi(rpd)
+                ok = rpd.exec()
+                if ok == QDialog.Accepted:
+                    self.p.remove_need(name.names.currentItem().text())
+                    QMessageBox.information(
+                        self, '成功', f'已删除{name.names.currentItem().text()}')
+                else:
+                    break
+            except AttributeError:
+                QMessageBox.critical(self, '错误', '没有物品')
+                return
+            except FileNotFoundError:
+                QMessageBox.critical(self, '错误', '未添加过数据')
+                return
 
     def run_plan(self):
         od = QDialog()
@@ -411,28 +474,39 @@ class MainWin(QMainWindow, Ui_MainWindow):
                     self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\plan文件夹中,需要手动清理')
 
     def append_report(self):
-        rd = QDialog()
-        stage = Report_Dialog()
-        stage.setupUi(rd)
-        ok = rd.exec()
-        if ok == QDialog.Accepted:
-            if not stage.drop_type.currentText() or not stage.item_name.currentText():
-                QMessageBox.warning(self, '错误', '未选择物品')
-            print(stage.stage.currentText())
-            print(stage.drop_type.currentText())
-            print(stage.item_name.currentText())
-            print(stage.item_quantity.value())
+        while True:
+            rd = QDialog()
+            stage = Report_Dialog()
+            stage.setupUi(rd)
+            ok = rd.exec()
+            if ok == QDialog.Accepted:
+                if not stage.drop_type.currentText() or not stage.item_name.currentText():
+                    QMessageBox.warning(self, '错误', '未选择物品')
+                    continue
+                result = self.p.update_report(stage.stage.currentText(), Material.Penguin.droptype_to_EN(
+                    stage.drop_type.currentText()), stage.item_name.currentText(), stage.item_quantity.value())
+                if result:
+                    QMessageBox.information(self, '添加成功', '添加成功')
+                else:
+                    QMessageBox.critical(self, '错误', '必须选择与上次一样的关卡')
+            else:
+                break
 
     def append_plan(self):
-        pd = QDialog()
-        item = Plan_Dialog()
-        item.setupUi(pd)
-        ok = pd.exec()
-        if ok == QDialog.Accepted:
-            self.p.update_need(item.item_name.currentText(),
-                               item.count.value())
-            QMessageBox.information(self, '添加成功', '添加需求:{},数量:{}'.format(
-                item.item_name.currentText(), item.count.value()))
+        temp = ''
+        while True:
+            pd = QDialog()
+            item = Plan_Dialog()
+            item.setupUi(pd)
+            ok = pd.exec()
+            if ok == QDialog.Accepted:
+                self.p.update_need(item.item_name.currentText(),
+                                   item.count.value())
+                temp += '添加需求:{},数量:{}\n'.format(
+                    item.item_name.currentText(), item.count.value())
+            else:
+                break
+        QMessageBox.information(self, '添加成功', temp)
 
     def RS(self):
         lasthost = []

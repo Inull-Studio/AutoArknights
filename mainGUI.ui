@@ -86,7 +86,7 @@
     </property>
     <widget class="QMenu" name="menu_6">
      <property name="title">
-      <string>上报数据</string>
+      <string>掉落汇报</string>
      </property>
      <addaction name="report"/>
      <addaction name="add_report"/>
@@ -94,7 +94,7 @@
     </widget>
     <widget class="QMenu" name="menu_7">
      <property name="title">
-      <string>计算规划</string>
+      <string>刷图规划</string>
      </property>
      <addaction name="plan"/>
      <addaction name="add_plan"/>
@@ -105,6 +105,7 @@
     <addaction name="separator"/>
     <addaction name="menu_6"/>
     <addaction name="menu_7"/>
+    <addaction name="refresh_data"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
@@ -184,12 +185,18 @@
   </action>
   <action name="delconfig">
    <property name="text">
-    <string>删除设置</string>
+    <string>删除ID</string>
+   </property>
+   <property name="toolTip">
+    <string>删除ID</string>
    </property>
   </action>
   <action name="report">
    <property name="text">
-    <string>上报</string>
+    <string>汇报</string>
+   </property>
+   <property name="toolTip">
+    <string>汇报</string>
    </property>
   </action>
   <action name="add_report">
@@ -199,7 +206,10 @@
   </action>
   <action name="plan">
    <property name="text">
-    <string>计算</string>
+    <string>规划</string>
+   </property>
+   <property name="toolTip">
+    <string>规划</string>
    </property>
   </action>
   <action name="add_plan">
@@ -215,6 +225,11 @@
   <action name="del_plan">
    <property name="text">
     <string>删除数据</string>
+   </property>
+  </action>
+  <action name="refresh_data">
+   <property name="text">
+    <string>刷新数据</string>
    </property>
   </action>
  </widget>

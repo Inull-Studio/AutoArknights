@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>353</width>
-    <height>264</height>
+    <height>265</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,34 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QListWidget" name="listWidget"/>
+       <widget class="QLabel" name="label">
+        <property name="maximumSize">
+         <size>
+          <width>90</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>关卡</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="stage">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -72,13 +99,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="item_name">
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
-       </widget>
+       <widget class="QListWidget" name="items"/>
       </item>
      </layout>
     </widget>

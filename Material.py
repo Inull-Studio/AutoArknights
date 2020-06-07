@@ -2,6 +2,7 @@
 import requests
 from PyQt5.QtGui import QGuiApplication
 import json
+import base64
 import os
 import urllib3
 
@@ -19,23 +20,29 @@ class Penguin(object):
 
     def __init__(self, uid=None):
         super(Penguin, self).__init__()
-        self.cookies = {}
+        self.cookies = {'userID': ''}
         self.required = {'exclude': [], "required": {}, "owned": {
         }, "extra_outc": False, "exp_demand": False, "gold_demand": False}
         self.report_json = {'server': 'CN', 'stageId': '', 'drops': []}
 
     def update_report(self, stageId, drop_type, itemid, quantity):
-        if self.report_json['stageId']:
+        if self.report_json['stageId'] and stageId != self.report_json['stageId']:
             return None
         self.report_json['stageId'] = stageId
         self.report_json['drops'].append(
             {'dropType': drop_type, 'itemId': itemid, 'quantity': quantity})
+        with open(r'.\temp_Data\report.txt', 'w', encoding='utf8') as f:
+            f.write(str(self.report_json))
         return True
 
-    def remove_report(itemid: str):
+    def remove_report(self, itemid: str = None, stage: str = None):
+        if stage:
+            self.report_json['stageId'] = ''
         for drop in self.report_json['drops']:
             if itemid == drop['itemId']:
                 self.report_json['drops'].remove(drop)
+                with open(r'.\temp_Data\report.txt', 'w', encoding='utf8') as f:
+                    f.write(str(self.report_json))
                 return True
         else:
             return None
@@ -43,13 +50,16 @@ class Penguin(object):
     def report(self):
         '''汇报数据
         返回结果 哈希值'''
-        if 'userID' not in self.cookies.keys():
-            return None
+        if not self.cookies['userID']:
+            return 'no userID'
         if not self.report_json['drops']:
-            return None
+            return 'no drops'
         r = requests.post(self.report_url, json=self.report_json,
                           headers=self.header, verify=False, cookies=self.cookies)
         if r.status_code == 201:
+            self.report_json['drops'] = []
+            self.report_json['stageId'] = ''
+            os.remove(r'.\temp_Data\report.txt')
             return r.json()['reportHash']
         else:
             return None
@@ -58,7 +68,7 @@ class Penguin(object):
         self.cookies['userID'] = uid
 
     def remove_id(self, uid):
-        if uid == self.cookies['userID']:
+        if uid == self.cookies['userID'] and self.cookies['userID']:
             self.cookies.pop('userID')
             return True
         else:
@@ -66,7 +76,7 @@ class Penguin(object):
 
     def update_need(self, name: str, count: int):
         self.required['required'][name] = count
-        with open('temp_Data/need.txt', 'w', encoding='utf8') as f:
+        with open(r'.\temp_Data\need.txt', 'w', encoding='utf8') as f:
             f.write(str(self.required))
 
     def remove_need(self, name: str):
@@ -99,6 +109,18 @@ class Penguin(object):
         with open(r'.\temp_Data\need.txt', 'r', encoding='utf8') as f:
             data = eval(f.read())
         return [x[0] for x in data['required'].items()]
+
+    @staticmethod
+    def get_report_stage():
+        with open(r'.\temp_Data\report.txt', 'r', encoding='utf8') as f:
+            data = eval(f.read())
+        return data['stageId']
+
+    @staticmethod
+    def get_report_items():
+        with open(r'.\temp_Data\report.txt', 'r', encoding='utf8') as f:
+            data = eval(f.read())
+        return [x['itemId'] for x in data['drops']]
 
     @staticmethod
     def format_plan(plan):
@@ -211,7 +233,8 @@ class Penguin(object):
 if __name__ == '__main__':
     p = Penguin()
     p.update_id('66068307')
-    print(p.report())
+    p.update_report('a', 'b', '11223', 14)
+    p.remove_report()
     # p.update_need('提纯源岩', 8)
     # p.update_report('pro_a_2', 'SPECIAL_DROP', 'ap_supply_lt_010',1)
     # print(p.report(),'\n')
