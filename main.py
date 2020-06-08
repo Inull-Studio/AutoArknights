@@ -483,8 +483,8 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 if not stage.drop_type.currentText() or not stage.item_name.currentText():
                     QMessageBox.warning(self, '错误', '未选择物品')
                     continue
-                result = self.p.update_report(stage.stage.currentText(), Material.Penguin.droptype_to_EN(
-                    stage.drop_type.currentText()), stage.item_name.currentText(), stage.item_quantity.value())
+                result = self.p.update_report(Material.Penguin.get_stageId_by_code(stage.stage.currentText()), Material.Penguin.droptype_to_EN(
+                    stage.drop_type.currentText()), Material.Penguin.name_to_itemid(stage.item_name.currentText()), stage.item_quantity.value())
                 if result:
                     QMessageBox.information(self, '添加成功', '添加成功')
                 else:

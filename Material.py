@@ -29,6 +29,8 @@ class Penguin(object):
         if self.report_json['stageId'] and stageId != self.report_json['stageId']:
             return None
         self.report_json['stageId'] = stageId
+        self.header[
+            'Referer'] = f'https://penguin-stats.cn/report/{Penguin.get_zoneId_by_stageId(stageId)}/{stageId}'
         self.report_json['drops'].append(
             {'dropType': drop_type, 'itemId': itemid, 'quantity': quantity})
         with open(r'.\temp_Data\report.txt', 'w', encoding='utf8') as f:
@@ -38,6 +40,7 @@ class Penguin(object):
     def remove_report(self, itemid: str = None, stage: str = None):
         if stage:
             self.report_json['stageId'] = ''
+            self.header['Referer'] = ''
         for drop in self.report_json['drops']:
             if itemid == drop['itemId']:
                 self.report_json['drops'].remove(drop)
@@ -103,6 +106,21 @@ class Penguin(object):
             return r.json()
         else:
             return None
+
+    @staticmethod
+    def get_zoneId_by_code(code: str):
+        data = Penguin.get_stage()
+        return [x['zoneId'] for x in data if code == data['code']]
+
+    @staticmethod
+    def get_zoneId_by_stageId(stageId: str):
+        data = Penguin.get_stage()
+        return [x['zoneId'] for x in data if stageId == x['stageId']][0]
+
+    @staticmethod
+    def get_stageId_by_code(code: str):
+        data = Penguin.get_stage()
+        return [x['stageId'] for x in data if code == x['code']][0]
 
     @staticmethod
     def get_need_names():
