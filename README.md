@@ -1,3 +1,5 @@
+**[使用帮助](https://github.com/Moran-Studio/AutoArknights/wiki)**
+
 # AutoArknights
 自动明日方舟
 
