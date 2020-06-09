@@ -25,3 +25,4 @@
 [企鹅物流数据统计](https://penguin-stats.cn)
 
 ### 按照GPLv3协议开源
+### [下载地址](https://github.com/Moran-Studio/AutoArknights/releases)
