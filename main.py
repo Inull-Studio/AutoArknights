@@ -10,7 +10,7 @@ from configparser import ConfigParser
 import os
 import shutil
 import Material
-import LAN
+import Lan
 from MissionLocation import M_to_L
 import re
 import six
@@ -525,7 +525,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                     if ok == QMessageBox.Yes:
                         portlist = eval(con.get('Nox', 'portlist'))
                         if not con.get('Nox', 'rport'):
-                            result = LAN.Connects(host, portlist)
+                            result = Lan.Connects(host, portlist)
                             if not result:
                                 QMessageBox.warning(self, '错误', '未开启模拟器')
                             elif 'unknow' in result:
@@ -537,7 +537,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 QMessageBox.information(
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
                         else:
-                            result = LAN.Connects(host, portlist)
+                            result = Lan.Connects(host, portlist)
                             if not result:
                                 QMessageBox.warning(self, '错误', '未开启模拟器')
                             elif 'unknow' in result:
@@ -563,7 +563,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                     self, '错误', '为输入端口号,或端口号不正确')
                                 return
                             if not con.get('Nox', 'rport'):
-                                result = LAN.Connects(host, [port])
+                                result = Lan.Connects(host, [port])
                                 if not result:
                                     QMessageBox.warning(self, '错误', '未开启模拟器')
                                 elif 'unknow' in result:
@@ -577,7 +577,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                     QMessageBox.information(
                                         self, '完成', '远程主机扫描完成，刷新设备会检测链接')
                             else:
-                                result = LAN.Connects(host, [port])
+                                result = Lan.Connects(host, [port])
                                 if not result:
                                     QMessageBox.warning(self, '错误', '未开启模拟器')
                                 elif 'unknow' in result:
@@ -603,7 +603,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                             QMessageBox.warning(self, '错误', '为输入端口号,或端口号不正确')
                             return
                         if not con.get('Nox', 'rport'):
-                            result = LAN.Connects(host, [port])
+                            result = Lan.Connects(host, [port])
                             if not result:
                                 QMessageBox.warning(self, '错误', '未开启模拟器')
                             elif 'unknow' in result:
@@ -615,7 +615,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 QMessageBox.information(
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
                         else:
-                            result = LAN.Connects(host, [port])
+                            result = Lan.Connects(host, [port])
                             if not result:
                                 QMessageBox.warning(self, '错误', '未开启模拟器')
                             elif 'unknow' in result:
