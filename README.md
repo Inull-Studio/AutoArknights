@@ -28,3 +28,4 @@
 
 ### 按照GPLv3协议开源
 ### [下载地址](https://github.com/Moran-Studio/AutoArknights/releases)
+### 有什么问题bug请添加issue
