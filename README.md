@@ -16,6 +16,8 @@
 ### 多平台
 - Python3语言，PyQt5新版图形界面，全平台兼容
 
+### 基于scrcpy在Windows中显示界面
+- [scrcpy](https://github.com/Genymobile/scrcpy)
 ### 添加企鹅物流数据统计api
 - 数据汇报
 - 刷图规划
