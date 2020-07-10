@@ -1,26 +1,35 @@
-**[使用帮助](https://github.com/Moran-Studio/AutoArknights/wiki)**
+## **[使用帮助](https://github.com/Moran-Studio/AutoArknights/wiki)**
 
 # AutoArknights
+
 自动明日方舟
 
 ### 图形化界面
+
 - 基础设置简单操作，一键启动
 
 ### 无限多开
-- 想几个号就几个号，一个程序，N个多开(只要你电脑受得了
+
+- 想几个号就几个号，一个程序，N 个多开(只要你电脑受得了
 
 ### 远程多开
+
 - 随时随地，想肝就肝，边工作边肝
 
 ### 多设备
+
 - 模拟器/手机，随时用，连上就能用
 
 ### 多平台
-- Python3语言，PyQt5新版图形界面，全平台兼容
 
-### 基于scrcpy在Windows中显示界面
+- Python3 语言，PyQt5 新版图形界面，全平台兼容
+
+### 基于 scrcpy 在 Windows 中显示界面
+
 - [scrcpy](https://github.com/Genymobile/scrcpy)
-### 添加企鹅物流数据统计api
+
+### 添加企鹅物流数据统计 api
+
 - 数据汇报
 - 刷图规划
 
@@ -28,6 +37,13 @@
 
 [企鹅物流数据统计](https://penguin-stats.cn)
 
-### 按照GPLv3协议开源
+### 按照 GPLv3 协议开源
+
 ### [下载地址](https://github.com/Moran-Studio/AutoArknights/releases)
-### 有什么问题bug请添加issue
+
+### 有什么问题 bug 请添加 issue
+
+### 未来准备实现的功能
+
+- OCR
+-

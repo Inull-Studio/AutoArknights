@@ -13,11 +13,6 @@ import Material
 import Lan
 from MissionLocation import M_to_L
 import re
-import six
-import packaging
-import packaging.version
-import packaging.specifiers
-import packaging.requirements
 import threading
 from subprocess import run, PIPE
 from os import walk, listdir, popen
@@ -38,7 +33,7 @@ logLevel = {10: 'DEBUG', 20: 'INFO', 30: 'WARN', 40: 'ERROR', 50: 'CRITICAL'}
 
 
 class Tab(QWidget, Ui_Form):
-    """AutoArknights的核心界面"""
+    """AutoArknights的核心界面(链接页面)"""
 
     def __init__(self, tabname: str, parent=None):
         """"""
@@ -76,6 +71,7 @@ class Tab(QWidget, Ui_Form):
         self.disp_btn.clicked.connect(self.disp)
 
     def disp(self):
+        # 显示当前链接设备
         if not self.device_name:
             self.setLog(self.tabname, logging.WARNING, '未选择设备')
             return
@@ -89,19 +85,23 @@ class Tab(QWidget, Ui_Form):
             0, None, r'.\Data\tools\scrcpy-noconsole', '-n', None, 1)
 
     def showThreeTimes(self):
+        # 显示限制三星日志
         self.setLog(self.tabname, logging.INFO,
                     '设置限制三星次数为{}'.format(self.threeTimes.value()))
 
     def xianzhiTimes(self):
+        # 显示限制运行三星限制日志
         self.xianzhi = self.Times.value()
         self.setLog(self.tabname, logging.INFO,
                     '设置限制运行次数为{}'.format(self.Times.value()))
 
     def KillRun(self):
+        # 结束链接运行进程
         try:
             if self.running:
                 self._async_raise(self.running, SystemExit)
                 self.setLog(self.tabname, logging.INFO, '=====结束运行=====')
+                self._enable_list()
                 self.running = None
                 self.run_times = 0
                 self.running_mission = None
@@ -109,6 +109,7 @@ class Tab(QWidget, Ui_Form):
             self.setLog(self.tabname, logging.WARNING, '进程未结束')
 
     def _async_raise(self, thread, exctype):
+        # 从网上找的结束threading线程
         """raises the exception, performs cleanup if needed"""
         tid = ctypes.c_long(thread.ident)
         if not inspect.isclass(exctype):
@@ -124,9 +125,11 @@ class Tab(QWidget, Ui_Form):
             raise SystemError("PyThreadState_SetAsyncExc failed")
 
     def Run_clicked(self):
+        # 开始运行
         if self.running:
             self.setLog(self.tabname, logging.INFO, '正在运行中，请不要重复运行')
             return
+        self._disable_list()
         self.setLog(self.tabname, logging.INFO, '=====开始运行=====')
         if self.SelfMission.isChecked():
             self.selfmission = True
@@ -137,9 +140,11 @@ class Tab(QWidget, Ui_Form):
             return
         if not self.Screen_size:
             self.setLog(self.tabname, logging.WARN, '没有选中活动设备')
+            self._enable_list()
             return
         if not self.MissionTree.currentItem().text(0):
             self.setLog(self.tabname, logging.WARN, '没有选中关卡')
+            self._enable_list()
             return
         runMission = M_to_L(self.LiZhi, self.loger, self.LogText,
                             self.MissionTree.currentItem().text(0))
@@ -149,40 +154,42 @@ class Tab(QWidget, Ui_Form):
         self.running.start()
 
     def LoopMission(self, runMission=None, M_location=None):
+        # 循环运行
         if self.selfmission and not M_location and runMission:
             self.running_mission = 'self'
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
-                runMission.selfMission(self.Eqlist.currentItem().text().split('\t')[
-                                       0], self.Screen_size)
+                runMission.selfMission(self.get_current_Eq(), self.Screen_size)
                 sleep(0.5)
                 lizhi = runMission.checklizhi(
-                    self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
+                    self.get_current_Eq(), self.Screen_size)
                 if not lizhi:
                     self.setLog(self.tabname, logging.INFO, '理智自动执行成功')
                     pass
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
                                 '不自动恢复理智,停止自动刷=============')
+                    self._enable_list()
                     return
 
-                run([r'.\Data\tools\adb', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input',
-                     'tap', str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
+                run([r'.\Data\tools\adb', '-s', self.get_current_Eq(), 'shell', 'input', 'tap', str(
+                    int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
                 self.setLog(self.tabname, logging.INFO,
                             '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
                 while True:
-                    if runMission.shengji(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
+                    if runMission.shengji(self.get_current_Eq(), self.Screen_size):
                         self.setLog(self.tabname, logging.INFO, '检测到升级,正在自动点击')
                     three = runMission.sanxing(
-                        self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
+                        self.get_current_Eq(), self.Screen_size)
                     if 'N' in three:
                         if not self.checkThree.isChecked():
                             self.three_times += 1
                         if self.three_times == self.threeTimes.value():
                             self.setLog(self.tabname, logging.ERROR,
                                         '非三星次数过多,已停止===============')
+                            self._enable_list()
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
                         break
@@ -194,41 +201,44 @@ class Tab(QWidget, Ui_Form):
                         break
                     pass
         else:
-            self.running_mission = self.MissionTree.currentItem().text()
+            self.running_mission = self.MissionTree.currentItem().text(0)
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
-                if not M_location(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
+                if not M_location(self.get_current_Eq(), self.Screen_size):
+                    self._enable_list()
                     return
                 sleep(0.5)
                 lizhi = runMission.checklizhi(
-                    self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
+                    self.get_current_Eq(), self.Screen_size)
                 if not lizhi:
                     self.setLog(self.tabname, logging.INFO, '理智自动执行成功')
                     pass
                 elif lizhi == 'buhuifu':
                     self.setLog(self.tabname, logging.INFO,
                                 '不自动恢复理智,停止自动刷=========')
+                    self._enable_list()
                     return
                 else:
+                    self._enable_list()
                     return
-                run([r'.\Data\tools\adb', '-s', self.Eqlist.currentItem().text().split('\t')[0], 'shell', 'input', 'tap',
-                     str(int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
-                self.setLog(self.tabname, logging.INFO,
-                            '进入关卡,60秒后循环检测运行状态')
+                run([r'.\Data\tools\adb', '-s', self.get_current_Eq(), 'shell', 'input', 'tap', str(
+                    int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
+                self.setLog(self.tabname, logging.INFO, '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
                 while True:
-                    if runMission.shengji(self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size):
+                    if runMission.shengji(self.get_current_Eq(), self.Screen_size):
                         self.setLog(self.tabname, logging.INFO, '检测到升级,正在自动点击')
                         break
                     three = runMission.sanxing(
-                        self.Eqlist.currentItem().text().split('\t')[0], self.Screen_size)
+                        self.get_current_Eq(), self.Screen_size)
                     if 'N' in three:
                         if not self.checkThree.isChecked():
                             self.three_times += 1
                         if self.three_times == self.threeTimes.value():
                             self.setLog(self.tabname, logging.ERROR,
                                         '非三星次数超限制,已停止=====')
+                            self._enable_list()
                             return
                         self.setLog(self.tabname, logging.WARN, '检测到未三星')
                         break
@@ -242,24 +252,27 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO, '运行完成')
 
     def Eq_clicked(self):
+        # 选择设备时运行
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
         self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.Eqlist.currentItem().text().split(
             '\t')[0]), 'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
         self.device_name = popen(r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(
-            self.Eqlist.currentItem().text().split('\t')[0])).read().strip('\n')
+            self.get_current_Eq())).read().strip('\n')
         if not self.Screen_size[0]:
             self.setLog(self.tabname, logging.INFO, self.Eqlist.currentItem(
             ).text().split('\t')[0]+' 未知错误,设备无法连接')
             self.Screen_size = []
             return
         self.setLog(self.tabname, logging.INFO,
-                    self.Eqlist.currentItem().text().split('\t')[0]+' 已选择')
+                    self.get_current_Eq()+' 已选择')
 
     def Mission_clicked(self):
+        # 选择关卡时日志
         self.setLog(self.tabname, logging.INFO,
                     self.MissionTree.currentItem().text(0)+' 已选择')
 
     def testEq(self):
+        # 点击刷新设备时运行
         self.Eqlist.clear()
         eq_list = []
         self.setLog(self.tabname, logging.INFO,
@@ -280,15 +293,16 @@ class Tab(QWidget, Ui_Form):
                 if 'offline' in l:
                     continue
                 b = l.split('\t')[0]
+                if not b:
+                    self.setLog(self.tabname, logging.INFO,
+                                self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+                    return
                 if '127.0.0.1' in b:
                     eq_list.append(b+'\t模拟器')
                 else:
                     eq_list.append(b+'\t手机')
-            eq_list = list(set(eq_list))
-            if not eq_list:
-                self.setLog(self.tabname, logging.INFO,
-                            self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
-            else:
+                eq_list = list(set(eq_list))
+            if eq_list:
                 self.Eqlist.addItems(eq_list)
         else:
             self.setLog(self.tabname, logging.WARNING, '本地未有设备(未扫描本地模拟器)')
@@ -308,18 +322,18 @@ class Tab(QWidget, Ui_Form):
                     b = l.split('\t')[0]
                     for host in eval(rhosts):
                         for port in eval(rports):
-                            QApplication.processEvents()
+                            if not b:
+                                self.setLog(
+                                    self.tabname, logging.INFO, self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+                                return
                             if '127.0.0.1' in b:
                                 eq_list.append(b+'\t模拟器')
                             elif host in b and int(port) > 50000:
                                 eq_list.append(b+'\t模拟器')
                             else:
                                 eq_list.append(b+'\t手机')
-                eq_list = list(set(eq_list))
-                if not eq_list:
-                    self.setLog(self.tabname, logging.INFO,
-                                self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
-                else:
+                    eq_list = list(set(eq_list))
+                if eq_list:
                     self.Eqlist.addItems(eq_list)
             else:
                 self.setLog(self.tabname, logging.WARNING, '远程地址未有设备(未扫远程描模)')
@@ -328,32 +342,53 @@ class Tab(QWidget, Ui_Form):
                     self.Eqlist.objectName()+' 测试完成')
 
     def buhuifu_clicked(self):
+        # 理智不回复
         self.LiZhi['buhuifu'] = True
         self.LiZhi['yaoji'] = False
         self.LiZhi['yuanshi'] = False
         self.setLog(self.tabname, logging.INFO, self.buhuifu.text()+' 已选择')
 
     def yuanshi_click(self):
+        # 源石恢复理智
         self.LiZhi['yuanshi'] = True
         self.LiZhi['buhuifu'] = False
         self.LiZhi['yaoji'] = False
         self.setLog(self.tabname, logging.INFO, self.yuanshi.text()+' 已选择')
 
     def yaoji_clicked(self):
+        # 药剂恢复理智
         self.LiZhi['yaoji'] = True
         self.LiZhi['buhuifu'] = False
         self.LiZhi['yuanshi'] = False
         self.setLog(self.tabname, logging.INFO, self.yaoji.text()+' 已选择')
 
     def save_Mission(self):
-        if not os.path.isfile(f'Data\\{self.tabname}_{self.running_mission}_{self.run_times}.png'):
-            shutil.copy('temp_Data\\three.png',
-                        f'Data\\{self.tabname}_{self.running_mission}_{self.run_times}.png')
+        # 运行完保存关卡结算图片
+        if not os.path.isfile(r'.\Data\Mission\{}_{}_{}.png'.format(self.tabname, self.running_mission, self.run_times)):
+            shutil.copy(r'.\temp_Data\three.png', r'.\Data\Mission\{}_{}_{}.png'.format(
+                self.tabname, self.running_mission, self.run_times))
 
     def setLog(self, tabname, level, msg):
+        # 设置日志
         logmsg = f'{logLevel[level]} {tabname}.{msg}'
         self.loger.log(level, f'{tabname}.{msg}')
         self.LogText.append(logmsg)
+
+    def _enable_list(self):
+        # 启用界面
+        self.Eqlist.setEnabled(True)
+        if not self.SelfMission.isChecked():
+            self.MissionTree.setEnabled(True)
+        self.SelfMission.setEnabled(True)
+
+    def _disable_list(self):
+        # 禁用页面
+        self.Eqlist.setEnabled(False)
+        self.MissionTree.setEnabled(False)
+        self.SelfMission.setEnabled(False)
+
+    def get_current_Eq(self):
+        return self.get_current_Eq()
 
 
 class MainWin(QMainWindow, Ui_MainWindow):
@@ -433,7 +468,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             if Hash:
                 QMessageBox.information(
                     self, '成功', '汇报成功,数据已清空\n汇报Hash已存放在Data\\report文件夹中，需要手动清理')
-                with open(r'.\Data\report\{} report.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
+                with open(r'.\Data\Report\{} report.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
                     f.write(Hash)
 
     def remove_plan(self):
@@ -468,10 +503,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
             if not result:
                 QMessageBox.warning(self, '无规划结果', '请检查是否添加数据')
                 return
-            with open('Data/plan/{} plan.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
+            with open('Data/Plan/{} plan.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
                 f.write(result)
                 QMessageBox.information(
-                    self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\plan文件夹中,需要手动清理')
+                    self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\Plan文件夹中,需要手动清理')
 
     def append_report(self):
         while True:
@@ -647,6 +682,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
             os.mkdir('Log')
         if not os.path.exists('.\\Data'):
             os.mkdir('Data')
+        if not os.path.exists(r'.\temp_Data'):
+            os.mkdir('temp_Data')
+        if not os.path.exists(r'.\Data\Plan'):
+            os.mkdir(r'.\Data\Plan')
 
     def __listPort(self):
         if not con.get('Nox', 'dir'):
@@ -663,11 +702,11 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 pass
             self.__listPort()
         elif not con.get('Nox', 'portlist'):
-            dir = con.get('Nox', 'dir')
+            dire = con.get('Nox', 'dir')
             portList = []
-            for file in listdir(rf'{dir}\BignoxVMS'):
+            for file in listdir(rf'{dire}\BignoxVMS'):
                 portList += [x[0] for x in re.findall('hostport="(\d*)" guestport="(\d*)"', open(
-                    rf'{dir}\BignoxVMS\{file}\{file}.vbox', 'r').read())]
+                    rf'{dire}\BignoxVMS\{file}\{file}.vbox', 'r').read())]
             portList = list(set(portList))
             con.set('Nox', 'portlist', str(portList))
             con.write(open('config.ini', 'w'))
@@ -676,7 +715,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             QMessageBox.information(self, '已存在', '设备已扫描完成')
             return
         else:
-            raise FileNotFoundError('夜神模拟器不存在')
+            raise
 
     def delLog(self):
         try:
@@ -696,7 +735,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
 
     def showAuthor(self):
         QMessageBox.about(self, '关于作者', '''
-        作者邮箱：2293830442@qq.com
+        作者QQ：2293830442
         作者Github：https://github.com/basket-ball
         作者bilibili：https://space.bilibili.com/16057264
         作者CSDN：https://blog.csdn.net/qq_40173711''')
@@ -708,10 +747,9 @@ class MainWin(QMainWindow, Ui_MainWindow):
     def ScanEq(self):
         try:
             self.__listPort()
-        except FileNotFoundError:
-            QMessageBox.critical(self, '文件缺失', '缺少关键文件,请验证程序完整性')
-        except:
-            QMessageBox.warning(
+        except Exception as e:
+            print(repr(e))
+            QMessageBox.critical(
                 self, '模拟器不存在', '夜神模拟器不存在,在链接内刷新设备可连接手机/或点击远程扫描')
 
     def delTab(self):

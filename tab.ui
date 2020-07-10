@@ -106,6 +106,9 @@
          </property>
          <item>
           <widget class="QListWidget" name="Eqlist">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>

@@ -4,7 +4,7 @@ from subprocess import run, PIPE
 import logging
 from threading import Thread
 from PyQt5.QtWidgets import QWidget
-from os import system
+from os import system, remove
 import datetime
 from cv2 import imread
 
@@ -13,7 +13,7 @@ logLevel = {10: 'DEBUG', 20: 'INFO',
 
 
 class M_to_L(object):
-    def __init__(self, lizhi: dict, loger: logging.RootLogger, logText: QWidget, mission: str = '自己指定关卡'):
+    def __init__(self, lizhi: dict, loger: logging.RootLogger, logText, mission: str = '自己指定关卡'):
         self.mission = mission
         self.tap_str = r'.\Data\tools\adb -s {} shell input tap {} {}'
         self.lizhi = lizhi
@@ -67,13 +67,13 @@ class M_to_L(object):
         system(r'.\Data\tools\adb -s '+eq +
                ' pull /sdcard/daili.png temp_Data\\daili.png >nul')
         system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/daili.png')
-        dailiImg = imread(r'temp_Data\daili.png')
+        dailiImg = imread(r'.\temp_Data\daili.png')
         if dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
             system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                    str(size[0]*0.875)+' '+str(size[1]*0.85))
             self.setLog(self.mission, logging.INFO, '代理开启成功')
-            system('del /s daili.png>nul')
+            remove(r'.\temp_Data\daili.png')
             return True
         elif dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] == 255:
             self.setLog(self.mission, logging.INFO, '代理已经开启')
@@ -532,7 +532,7 @@ class M_to_L(object):
         system(self.tap_str.format(eq, size[0]*0.875, size[1]*(8/9)))
 
     def tap(self, eq: str, x: int, y: int):
-        run(self.tap_str.format(eqstr(x), str(y)), stdout=PIPE)
+        run(self.tap_str.format(eq, str(x), str(y)), stdout=PIPE)
 
     def setLog(self, mission, level, msg):
         logmsg = f'{logLevel[level]} {mission}.{msg}'

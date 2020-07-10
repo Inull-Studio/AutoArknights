@@ -108,6 +108,27 @@ class Penguin(object):
             return None
 
     @staticmethod
+    def format_plan(plan):
+        if not plan:
+            return None
+        format_text = ''
+        cost = str(plan['cost'])
+        exp = str(plan['exp'])
+        gold = str(plan['gold'])
+        format_text += '预计理智花费: '+cost+'\n'
+        format_text += '预计获得经验: '+exp+'\n'
+        format_text += '预计龙门币收入: '+gold+'\n'
+        stages = ['运行:'+' '+x['stage']+' ' +
+                  x['count']+' '+'次' for x in plan['stages']]
+        synthesis = ['合成:'+' '+x['target']+' ' +
+                     x['count']+' '+'次' for x in plan['syntheses']]
+        for stage in stages:
+            format_text += stage+'\n'
+        for synthesi in synthesis:
+            format_text += synthesi+'\n'
+        return format_text
+
+    @staticmethod
     def get_zoneId_by_code(code: str):
         data = Penguin.get_stage()
         return [x['zoneId'] for x in data if code == data['code']]
@@ -140,34 +161,6 @@ class Penguin(object):
             data = eval(f.read())
         return [x['itemId'] for x in data['drops']]
 
-    @staticmethod
-    def format_plan(plan):
-        if not plan:
-            return None
-        format_text = ''
-        cost = str(plan['cost'])
-        exp = str(plan['exp'])
-        gold = str(plan['gold'])
-        format_text += '预计理智花费: '+cost+'\n'
-        format_text += '预计获得经验: '+exp+'\n'
-        format_text += '预计龙门币收入: '+gold+'\n'
-        stages = ['运行:'+' '+x['stage']+' ' +
-                  x['count']+' '+'次' for x in plan['stages']]
-        synthesis = ['合成:'+' '+x['target']+' ' +
-                     x['count']+' '+'次' for x in plan['syntheses']]
-        for stage in stages:
-            format_text += stage+'\n'
-        for synthesi in synthesis:
-            format_text += synthesi+'\n'
-        return format_text
-
-    @ staticmethod
-    def down_items():
-        r = requests.get('https://penguin-stats.io/PenguinStats/api/v2/items')
-        result = str(r.json())
-        with open(r'.\Data\items.json', 'w', encoding='utf8') as f:
-            f.write(result)
-
     @ staticmethod
     def get_items():
         data = eval(open(r'.\Data\items.json', 'r', encoding='utf8').read())
@@ -180,6 +173,20 @@ class Penguin(object):
     @ staticmethod
     def droptype_to_EN(dp: str):
         return [x[0] for x in DROP_TYPE.items() if dp in x[1]][0]
+
+    @ staticmethod
+    def itemid_to_name(id: str):
+        data = Penguin.get_items()
+        item_name = [x['name'] for x in data if id in x.values()]
+        if item_name:
+            return item_name[0]
+
+    @ staticmethod
+    def name_to_itemid(name: str):
+        data = Penguin.get_items()
+        item_id = [x['itemId'] for x in data if name in x.values()]
+        if item_id:
+            return item_id[0]
 
     @ staticmethod
     def get_stage_itemId(stage: str):
@@ -195,20 +202,6 @@ class Penguin(object):
             item_id = [y['itemId']
                        for y in x if drop_type in y.values() and 'itemId' in y.keys()]
         return item_id
-
-    @ staticmethod
-    def itemid_to_name(id: str):
-        data = Penguin.get_items()
-        item_name = [x['name'] for x in data if id in x.values()]
-        if item_name:
-            return item_name[0]
-
-    @ staticmethod
-    def name_to_itemid(name: str):
-        data = Penguin.get_items()
-        item_id = [x['itemId'] for x in data if name in x.values()]
-        if item_id:
-            return item_id[0]
 
     @ staticmethod
     def get_dropinfos(stage: str):
@@ -234,6 +227,12 @@ class Penguin(object):
         return [x['code'] for x in data if 'dropInfos' in x.keys()]
 
     @staticmethod
+    def get_stage(server: str = 'CN'):
+        data = json.loads(
+            open(r'.\Data\stage.json', 'r', encoding='utf8').read())
+        return data
+
+    @staticmethod
     def down_stage(server: str = 'CN'):
         r = requests.get(
             'https://penguin-stats.io/PenguinStats/api/v2/stages?server={server}')
@@ -242,10 +241,11 @@ class Penguin(object):
             f.write(result)
 
     @staticmethod
-    def get_stage(server: str = 'CN'):
-        data = json.loads(
-            open(r'.\Data\stage.json', 'r', encoding='utf8').read())
-        return data
+    def down_items():
+        r = requests.get('https://penguin-stats.io/PenguinStats/api/v2/items')
+        result = str(r.json())
+        with open(r'.\Data\items.json', 'w', encoding='utf8') as f:
+            f.write(result)
 
 
 if __name__ == '__main__':
