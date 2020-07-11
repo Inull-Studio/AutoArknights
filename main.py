@@ -254,17 +254,16 @@ class Tab(QWidget, Ui_Form):
     def Eq_clicked(self):
         # 选择设备时运行
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
-        self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.Eqlist.currentItem().text().split(
-            '\t')[0]), 'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell',
+                                                 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
         self.device_name = popen(r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(
             self.get_current_Eq())).read().strip('\n')
         if not self.Screen_size[0]:
-            self.setLog(self.tabname, logging.INFO, self.Eqlist.currentItem(
-            ).text().split('\t')[0]+' 未知错误,设备无法连接')
+            self.setLog(self.tabname, logging.INFO,
+                        self.get_current_Eq()+' 未知错误,设备无法连接')
             self.Screen_size = []
             return
-        self.setLog(self.tabname, logging.INFO,
-                    self.get_current_Eq()+' 已选择')
+        self.setLog(self.tabname, logging.INFO, self.get_current_Eq()+' 已选择')
 
     def Mission_clicked(self):
         # 选择关卡时日志
@@ -388,7 +387,7 @@ class Tab(QWidget, Ui_Form):
         self.SelfMission.setEnabled(False)
 
     def get_current_Eq(self):
-        return self.get_current_Eq()
+        return self.Eqlist.currentItem().text().split('\t')[0]
 
 
 class MainWin(QMainWindow, Ui_MainWindow):
@@ -669,12 +668,11 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
 
     def delConfig(self):
-        if con.get('Nox', 'dir'):
-            con.set('Nox', 'dir', '')
-            con.set('Nox', 'portlist', '')
-            con.set('Nox', 'rhost', '')
-            con.set('Nox', 'rport', '')
-            con.write(open('config.ini', 'w'))
+        con.set('Nox', 'dir', '')
+        con.set('Nox', 'portlist', '')
+        con.set('Nox', 'rhost', '')
+        con.set('Nox', 'rport', '')
+        con.write(open('config.ini', 'w'))
         QMessageBox.information(self, '通知', '已经删除config.ini配置')
 
     def firstCheck(self):
@@ -686,6 +684,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
             os.mkdir('temp_Data')
         if not os.path.exists(r'.\Data\Plan'):
             os.mkdir(r'.\Data\Plan')
+        if not os.path.exists(r'.\Data\Report'):
+            os.mkdir(r'.\Data\Report')
+        if not os.path.exists(r'.\Data\Mission'):
+            os.mkdir(r'.\Data\Mission')
 
     def __listPort(self):
         if not con.get('Nox', 'dir'):
