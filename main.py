@@ -256,6 +256,7 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
         self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell',
                                                  'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        self.Screen_size.sort()
         self.device_name = popen(r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(
             self.get_current_Eq())).read().strip('\n')
         if not self.Screen_size[0]:
@@ -776,7 +777,7 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
         win = MainWin()
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                             r'Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched')
+                             r'Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store')
         if not os.path.exists('config.ini'):
             raise FileNotFoundError
         con = ConfigParser()
