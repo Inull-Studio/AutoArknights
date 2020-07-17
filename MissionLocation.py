@@ -35,10 +35,10 @@ class M_to_L(object):
         detail_img = data[int(data.shape[0]/(18/11)):]
         stage_img = rimg[int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),
                          int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
-        if data[int(size[1]*(51/72)), int(size[0]*(37/144))][2] == 62:
+        if data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 62:
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             return 'Yes'
-        elif data[int(size[1]*(51/72)), int(size[0]*(37/144))][2] == 74:
+        elif data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 74:
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             return 'No'
         else:
@@ -52,7 +52,7 @@ class M_to_L(object):
                ' pull /sdcard/shengji.png temp_Data\\shengji.png 1>nul 2>nul')
         system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/shengji.png')
         data1 = imread('temp_Data\\shengji.png')
-        if data1[int(size[1]*0.4), int(size[0]*0.26875)][2] == 1:
+        if data1[int(size[0]*0.26875), int(size[1]*0.4)][2] == 1:
             self.setLog(self.mission, logging.INFO, '发生升级')
             system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             sleep(5)
@@ -68,14 +68,14 @@ class M_to_L(object):
                ' pull /sdcard/daili.png temp_Data\\daili.png >nul')
         system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/daili.png')
         dailiImg = imread(r'.\temp_Data\daili.png')
-        if dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] != 255:
+        if dailiImg[int(size[0]*(123/144)), int(size[1]*(59/72))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
             system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
-                   str(size[0]*0.875)+' '+str(size[1]*0.85))
+                   str(int(size[0]*0.875))+' '+str(int(size[1]*0.85)))
             self.setLog(self.mission, logging.INFO, '代理开启成功')
             remove(r'.\temp_Data\daili.png')
             return True
-        elif dailiImg[int(size[1]*(59/72)), int(size[0]*(123/144))][2] == 255:
+        elif dailiImg[int(size[0]*(123/144)), int(size[1]*(59/72))][2] == 255:
             self.setLog(self.mission, logging.INFO, '代理已经开启')
             return True
         else:
@@ -89,11 +89,11 @@ class M_to_L(object):
                ' pull /sdcard/lizhi.png temp_Data\\lizhi.png 1>nul 2>nul')
         system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/lizhi.png')
         lizhiImg = imread('temp_Data\\lizhi.png')
-        if lizhiImg[int(size[1]*(5/9)), int(size[0]*(120/144))][2] != 130:
+        if lizhiImg[int(size[0]*(120/144)), int(size[1]*(5/9))][2] != 130:
             if self.lizhi['buhuifu']:
                 return 'buhuifu'
             else:
-                if lizhiImg[int(size[1]*(5/36)), int(size[0]*(75/144))][2] == 255 and self.lizhi['yaoji']:
+                if lizhiImg[int(size[0]*(75/144)), int(size[1]*(5/36))][2] == 255 and self.lizhi['yaoji']:
                     system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                            str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
                     sleep(1)
@@ -101,7 +101,7 @@ class M_to_L(object):
                            str(size[0]*0.875)+' '+str(size[1]*(8/9)))
                     sleep(2)
                     return False
-                elif lizhiImg[int(size[1]*(5/36)), int(size[0]*(106/144))][2] == 255 and self.lizhi['yaoji']:
+                elif lizhiImg[int(size[0]*(106/144)), int(size[1]*(5/36))][2] == 255 and self.lizhi['yaoji']:
                     self.setLog(self.mission, logging.WARN, '没有药剂，无法恢复，终止程序')
                     sleep(1)
                     return True
@@ -116,7 +116,7 @@ class M_to_L(object):
                            eq+' shell rm /sdcard/2.png')
                     sleep(1)
                     shitou = imread('temp_Data\\2.png')
-                    if shitou[int(size[1]*(7/45)), int(size[0]*0.275)][2] == 255:
+                    if shitou[int(size[0]*0.275), int(size[1]*(7/45))][2] == 255:
                         return False
                     return True
         else:

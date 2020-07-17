@@ -150,7 +150,7 @@ class Tab(QWidget, Ui_Form):
                             self.MissionTree.currentItem().text(0))
         M_location = runMission.retMission()
         self.running = threading.Thread(target=self.LoopMission, args=(
-            M_location, runMission), daemon=True, name=self.tabname)
+            runMission, M_location), daemon=True, name=self.tabname)
         self.running.start()
 
     def LoopMission(self, runMission=None, M_location=None):
@@ -172,7 +172,6 @@ class Tab(QWidget, Ui_Form):
                                 '不自动恢复理智,停止自动刷=============')
                     self._enable_list()
                     return
-
                 run([r'.\Data\tools\adb', '-s', self.get_current_Eq(), 'shell', 'input', 'tap', str(
                     int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
                 self.setLog(self.tabname, logging.INFO,
@@ -256,9 +255,11 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
         self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell',
                                                  'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        print('screen')
         self.Screen_size.sort()
-        self.device_name = popen(r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(
-            self.get_current_Eq())).read().strip('\n')
+        self.device_name = popen(
+            r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(self.get_current_Eq())).read().strip('\n')
+        print('device')
         if not self.Screen_size[0]:
             self.setLog(self.tabname, logging.INFO,
                         self.get_current_Eq()+' 未知错误,设备无法连接')
