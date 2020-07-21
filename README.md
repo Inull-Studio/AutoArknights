@@ -39,6 +39,8 @@
 
 ### 按照 GPLv3 协议开源
 
+任何以此为名的付费商业应用或服务均为假的
+
 ### [下载地址](https://github.com/Moran-Studio/AutoArknights/releases)
 
 ### 有什么问题 bug 请添加 issue
