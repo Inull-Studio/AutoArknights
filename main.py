@@ -17,9 +17,8 @@ import threading
 from subprocess import run, PIPE
 from os import walk, listdir, popen
 from time import sleep, strftime
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QWidget, QMainWindow, QDialog, QMessageBox, QInputDialog, QApplication
+from PyQt5.QtCore import QTextCodec
 import logging
 from tab import Ui_Form
 from mainGUI import Ui_MainWindow
@@ -36,7 +35,6 @@ class Tab(QWidget, Ui_Form):
     """AutoArknights的核心界面(链接页面)"""
 
     def __init__(self, tabname: str, parent=None):
-        """"""
         super(Tab, self).__init__(parent)
         self.setupUi(self)
         self.three_times = 0
@@ -49,13 +47,6 @@ class Tab(QWidget, Ui_Form):
         self.LiZhi = {'buhuifu': True, 'yaoji': False, 'yuanshi': False}
         self.Screen_size = []
         self.tabname = tabname
-        self.loger = logging.getLogger(tabname)
-        self.loger.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(
-            '.\\Log\\'+tabname+'.log', mode='a', encoding='utf8')
-        handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S'))
-        self.loger.addHandler(handler)
         self.buhuifu.clicked.connect(self.buhuifu_clicked)
         self.yaoji.clicked.connect(self.yaoji_clicked)
         self.yuanshi.clicked.connect(self.yuanshi_click)
@@ -142,12 +133,12 @@ class Tab(QWidget, Ui_Form):
             self.setLog(self.tabname, logging.WARN, '没有选中活动设备')
             self._enable_list()
             return
-        if not self.MissionTree.currentItem().text(0):
+        if not self.running_mission:
             self.setLog(self.tabname, logging.WARN, '没有选中关卡')
             self._enable_list()
             return
         runMission = M_to_L(self.LiZhi, self.loger, self.LogText,
-                            self.MissionTree.currentItem().text(0))
+                            self.running_mission)
         M_location = runMission.retMission()
         self.running = threading.Thread(target=self.LoopMission, args=(
             runMission, M_location), daemon=True, name=self.tabname)
@@ -200,7 +191,7 @@ class Tab(QWidget, Ui_Form):
                         break
                     pass
         else:
-            self.running_mission = self.MissionTree.currentItem().text(0)
+            self.running_mission = self.get_current_Mission()
             while self.xianzhi:
                 if not self.buxianzhi.isChecked():
                     self.xianzhi -= 1
@@ -253,8 +244,8 @@ class Tab(QWidget, Ui_Form):
     def Eq_clicked(self):
         # 选择设备时运行
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
-        self.Screen_size = [int(x) for x in run([r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell',
-                                                 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
+        self.Screen_size = [int(x) for x in run(
+            [r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
         print('screen')
         self.Screen_size.sort()
         self.device_name = popen(
@@ -269,8 +260,8 @@ class Tab(QWidget, Ui_Form):
 
     def Mission_clicked(self):
         # 选择关卡时日志
-        self.setLog(self.tabname, logging.INFO,
-                    self.MissionTree.currentItem().text(0)+' 已选择')
+        self.running_mission = self.get_current_Mission()
+        self.setLog(self.tabname, logging.INFO, self.running_mission+' 已选择')
 
     def testEq(self):
         # 点击刷新设备时运行
@@ -390,6 +381,18 @@ class Tab(QWidget, Ui_Form):
 
     def get_current_Eq(self):
         return self.Eqlist.currentItem().text().split('\t')[0]
+
+    def get_current_Mission(self):
+        return self.MissionTree.currentItem().text(0)
+
+    def logger(self):
+        self.loger = logging.getLogger(self.tabname)
+        self.loger.setLevel(logging.DEBUG)
+        handler = logging.FileHandler(
+            '.\\Log\\'+self.tabname+'.log', mode='a', encoding='utf8')
+        handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s %(message)s', '%Y-%m-%d %H:%M:%S'))
+        self.loger.addHandler(handler)
 
 
 class MainWin(QMainWindow, Ui_MainWindow):
