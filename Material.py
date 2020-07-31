@@ -12,7 +12,7 @@ DROP_TYPE = {'NORMAL_DROP': '常规掉落', 'EXTRA_DROP': '额外掉落',
 
 
 class Penguin(object):
-    """docstring for Penguin"""
+    """企鹅统计相关api"""
     header = {'User-Agent': 'ozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.44 Safari/537.36 Edg/83.0.478.28',
               'accept': 'application/json, text/plain, */*', 'origin': 'https://penguin-stats.cn', }
     report_url = 'https://penguin-stats.cn/PenguinStats/api/v2/report'
