@@ -538,9 +538,3 @@ class M_to_L(object):
         logmsg = f'{logLevel[level]} {mission}.{msg}'
         self.loger.log(level, f'{mission}.{msg}')
         self.logText.append(logmsg)
-
-
-if __name__ == '__main__':
-    Mission = M_to_L('CE-5')
-    func = Mission.retMission()
-    func('LS-5', [1600, 900])

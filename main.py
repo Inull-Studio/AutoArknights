@@ -61,8 +61,8 @@ class Tab(QWidget, Ui_Form):
         self.threeTimes.valueChanged.connect(self.showThreeTimes)
         self.disp_btn.clicked.connect(self.disp)
 
+# 显示当前链接设备
     def disp(self):
-        # 显示当前链接设备
         if not self.device_name:
             self.setLog(self.tabname, logging.WARNING, '未选择设备')
             return
@@ -75,19 +75,19 @@ class Tab(QWidget, Ui_Form):
         win32api.ShellExecute(
             0, None, r'.\Data\tools\scrcpy-noconsole', '-n', None, 1)
 
+# 显示限制三星日志
     def showThreeTimes(self):
-        # 显示限制三星日志
         self.setLog(self.tabname, logging.INFO,
                     '设置限制三星次数为{}'.format(self.threeTimes.value()))
 
+# 显示限制运行三星限制日志
     def xianzhiTimes(self):
-        # 显示限制运行三星限制日志
         self.xianzhi = self.Times.value()
         self.setLog(self.tabname, logging.INFO,
                     '设置限制运行次数为{}'.format(self.Times.value()))
 
+# 结束链接运行进程
     def KillRun(self):
-        # 结束链接运行进程
         try:
             if self.running:
                 self._async_raise(self.running, SystemExit)
@@ -99,8 +99,8 @@ class Tab(QWidget, Ui_Form):
         except:
             self.setLog(self.tabname, logging.WARNING, '进程未结束')
 
+# 从网上找的结束threading线程
     def _async_raise(self, thread, exctype):
-        # 从网上找的结束threading线程
         """raises the exception, performs cleanup if needed"""
         tid = ctypes.c_long(thread.ident)
         if not inspect.isclass(exctype):
@@ -115,8 +115,8 @@ class Tab(QWidget, Ui_Form):
             ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
             raise SystemError("PyThreadState_SetAsyncExc failed")
 
+# 开始运行
     def Run_clicked(self):
-        # 开始运行
         if self.running:
             self.setLog(self.tabname, logging.INFO, '正在运行中，请不要重复运行')
             return
@@ -144,8 +144,8 @@ class Tab(QWidget, Ui_Form):
             runMission, M_location), daemon=True, name=self.tabname)
         self.running.start()
 
+# 循环运行
     def LoopMission(self, runMission=None, M_location=None):
-        # 循环运行
         if self.selfmission and not M_location and runMission:
             self.running_mission = 'self'
             while self.xianzhi:
@@ -241,8 +241,8 @@ class Tab(QWidget, Ui_Form):
                     pass
         self.setLog(self.tabname, logging.INFO, '运行完成')
 
+# 选择设备时运行
     def Eq_clicked(self):
-        # 选择设备时运行
         self.setLog(self.tabname, logging.INFO, '正在选择设备、测试')
         self.Screen_size = [int(x) for x in run(
             [r'.\Data\tools\adb', '-s', '{}'.format(self.get_current_Eq()), 'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')[::-1]]
@@ -258,13 +258,13 @@ class Tab(QWidget, Ui_Form):
             return
         self.setLog(self.tabname, logging.INFO, self.get_current_Eq()+' 已选择')
 
+# 选择关卡时日志
     def Mission_clicked(self):
-        # 选择关卡时日志
         self.running_mission = self.get_current_Mission()
         self.setLog(self.tabname, logging.INFO, self.running_mission+' 已选择')
 
+# 点击刷新设备时运行
     def testEq(self):
-        # 点击刷新设备时运行
         self.Eqlist.clear()
         eq_list = []
         self.setLog(self.tabname, logging.INFO,
@@ -333,58 +333,61 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.tabname, logging.INFO,
                     self.Eqlist.objectName()+' 测试完成')
 
+# 理智不回复
     def buhuifu_clicked(self):
-        # 理智不回复
         self.LiZhi['buhuifu'] = True
         self.LiZhi['yaoji'] = False
         self.LiZhi['yuanshi'] = False
         self.setLog(self.tabname, logging.INFO, self.buhuifu.text()+' 已选择')
 
+# 源石恢复理智
     def yuanshi_click(self):
-        # 源石恢复理智
         self.LiZhi['yuanshi'] = True
         self.LiZhi['buhuifu'] = False
         self.LiZhi['yaoji'] = False
         self.setLog(self.tabname, logging.INFO, self.yuanshi.text()+' 已选择')
 
+# 药剂恢复理智
     def yaoji_clicked(self):
-        # 药剂恢复理智
         self.LiZhi['yaoji'] = True
         self.LiZhi['buhuifu'] = False
         self.LiZhi['yuanshi'] = False
         self.setLog(self.tabname, logging.INFO, self.yaoji.text()+' 已选择')
 
+# 运行完保存关卡结算图片
     def save_Mission(self):
-        # 运行完保存关卡结算图片
         if not os.path.isfile(r'.\Data\Mission\{}_{}_{}.png'.format(self.tabname, self.running_mission, self.run_times)):
             shutil.copy(r'.\temp_Data\three.png', r'.\Data\Mission\{}_{}_{}.png'.format(
                 self.tabname, self.running_mission, self.run_times))
 
+# 设置日志
     def setLog(self, tabname, level, msg):
-        # 设置日志
         logmsg = f'{logLevel[level]} {tabname}.{msg}'
         self.loger.log(level, f'{tabname}.{msg}')
         self.LogText.append(logmsg)
 
+# 启用界面
     def _enable_list(self):
-        # 启用界面
         self.Eqlist.setEnabled(True)
         if not self.SelfMission.isChecked():
             self.MissionTree.setEnabled(True)
         self.SelfMission.setEnabled(True)
 
+# 禁用页面
     def _disable_list(self):
-        # 禁用页面
         self.Eqlist.setEnabled(False)
         self.MissionTree.setEnabled(False)
         self.SelfMission.setEnabled(False)
 
+# 获取当前选中设备
     def get_current_Eq(self):
         return self.Eqlist.currentItem().text().split('\t')[0]
 
+# 获取当前选中关卡
     def get_current_Mission(self):
         return self.MissionTree.currentItem().text(0)
 
+# 设置log内容
     def logger(self):
         self.loger = logging.getLogger(self.tabname)
         self.loger.setLevel(logging.DEBUG)

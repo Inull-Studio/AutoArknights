@@ -25,6 +25,7 @@ class Penguin(object):
         }, "extra_outc": False, "exp_demand": False, "gold_demand": False}
         self.report_json = {'server': 'CN', 'stageId': '', 'drops': []}
 
+# 添加掉落汇报数据
     def update_report(self, stageId, drop_type, itemid, quantity):
         if self.report_json['stageId'] and stageId != self.report_json['stageId']:
             return None
@@ -37,6 +38,7 @@ class Penguin(object):
             f.write(str(self.report_json))
         return True
 
+# 移除掉落汇报物品
     def remove_report(self, itemid: str = None, stage: str = None):
         if stage:
             self.report_json['stageId'] = ''
@@ -50,9 +52,8 @@ class Penguin(object):
         else:
             return None
 
+# 汇报数据，返回哈希值
     def report(self):
-        '''汇报数据
-        返回结果 哈希值'''
         if not self.cookies['userID']:
             return 'no userID'
         if not self.report_json['drops']:
@@ -67,9 +68,11 @@ class Penguin(object):
         else:
             return None
 
+# 上传企鹅统计ID
     def update_id(self, uid):
         self.cookies['userID'] = uid
 
+# 删除企鹅统计ID
     def remove_id(self, uid):
         if uid == self.cookies['userID'] and self.cookies['userID']:
             self.cookies.pop('userID')
@@ -77,11 +80,13 @@ class Penguin(object):
         else:
             return None
 
+# 添加刷图规划材料
     def update_need(self, name: str, count: int):
         self.required['required'][name] = count
         with open(r'.\temp_Data\need.txt', 'w', encoding='utf8') as f:
             f.write(str(self.required))
 
+# 移除刷图规划材料
     def remove_need(self, name: str):
         if name in self.required['required']:
             self.required['required'].pop(name)
@@ -91,6 +96,7 @@ class Penguin(object):
         else:
             return None
 
+# 规划
     def plan(self, out: False, exp: False, gold: False):
         self.required['extra_outc'] = out
         self.required['exp_demand'] = exp
@@ -107,6 +113,7 @@ class Penguin(object):
         else:
             return None
 
+# 格式化计划结果
     @staticmethod
     def format_plan(plan):
         if not plan:
@@ -128,52 +135,62 @@ class Penguin(object):
             format_text += synthesi+'\n'
         return format_text
 
+# code转换zoneId
     @staticmethod
     def get_zoneId_by_code(code: str):
         data = Penguin.get_stage()
         return [x['zoneId'] for x in data if code == data['code']]
 
+# stageID转换zoneId
     @staticmethod
     def get_zoneId_by_stageId(stageId: str):
         data = Penguin.get_stage()
         return [x['zoneId'] for x in data if stageId == x['stageId']][0]
 
+# code转换stageId
     @staticmethod
     def get_stageId_by_code(code: str):
         data = Penguin.get_stage()
         return [x['stageId'] for x in data if code == x['code']][0]
 
+# 获取当前刷图规划需求物品
     @staticmethod
     def get_need_names():
         with open(r'.\temp_Data\need.txt', 'r', encoding='utf8') as f:
             data = eval(f.read())
         return [x[0] for x in data['required'].items()]
 
+# 获取当前掉落汇报的关卡
     @staticmethod
     def get_report_stage():
         with open(r'.\temp_Data\report.txt', 'r', encoding='utf8') as f:
             data = eval(f.read())
         return data['stageId']
 
+# 获取当前掉落汇报的物品
     @staticmethod
     def get_report_items():
         with open(r'.\temp_Data\report.txt', 'r', encoding='utf8') as f:
             data = eval(f.read())
         return [x['itemId'] for x in data['drops']]
 
+# 获取所有物品数据
     @ staticmethod
     def get_items():
         data = eval(open(r'.\Data\items.json', 'r', encoding='utf8').read())
         return data
 
+# droptype英文转中文
     @ staticmethod
-    def droptype_to_CN(droptype: str):
-        return DROP_TYPE[droptype]
+    def droptype_to_CN(dp: str):
+        return DROP_TYPE[dp]
 
+# droptype中文转英文
     @ staticmethod
     def droptype_to_EN(dp: str):
         return [x[0] for x in DROP_TYPE.items() if dp in x[1]][0]
 
+# 物品id转换为物品名
     @ staticmethod
     def itemid_to_name(id: str):
         data = Penguin.get_items()
@@ -181,6 +198,7 @@ class Penguin(object):
         if item_name:
             return item_name[0]
 
+# 物品名转换为物品id
     @ staticmethod
     def name_to_itemid(name: str):
         data = Penguin.get_items()
@@ -188,6 +206,7 @@ class Penguin(object):
         if item_id:
             return item_id[0]
 
+# 获取关卡中掉落的物品id
     @ staticmethod
     def get_stage_itemId(stage: str):
         drop_infos = Penguin.get_dropinfos(stage)
@@ -195,6 +214,7 @@ class Penguin(object):
             item_id = [y['itemId'] for y in x if 'itemId' in y.keys()]
         return item_id
 
+# 按照掉落类型获取关卡中掉落的物品id
     @ staticmethod
     def get_stage_itemId_by_droptype(stage: str, drop_type: str):
         drop_infos = Penguin.get_dropinfos(stage)
@@ -203,6 +223,7 @@ class Penguin(object):
                        for y in x if drop_type in y.values() and 'itemId' in y.keys()]
         return item_id
 
+# 获取所有关卡掉落信息
     @ staticmethod
     def get_dropinfos(stage: str):
         data = Penguin.get_stage()
@@ -210,6 +231,7 @@ class Penguin(object):
                       for x in data if 'dropInfos' in x.keys() and stage in x.values()]
         return drop_infos
 
+# 获取关卡中所有掉落物品类型
     @staticmethod
     def get_droptype(stage: str):
         data = Penguin.get_dropinfos(stage)
@@ -220,18 +242,21 @@ class Penguin(object):
         else:
             return []
 
+# 获取所有关卡code
     @staticmethod
     def get_stage_code():
         data = json.loads(
             open(r'.\Data\stage.json', 'r', encoding='utf8').read())
         return [x['code'] for x in data if 'dropInfos' in x.keys()]
 
+# 获取所有关卡数据
     @staticmethod
     def get_stage(server: str = 'CN'):
         data = json.loads(
             open(r'.\Data\stage.json', 'r', encoding='utf8').read())
         return data
 
+# 更新本地关卡信息
     @staticmethod
     def down_stage(server: str = 'CN'):
         r = requests.get(
@@ -240,27 +265,10 @@ class Penguin(object):
         with open(r'.\Data\stage.json', 'w', encoding='utf8') as f:
             f.write(result)
 
+# 更新本地物品信息
     @staticmethod
     def down_items():
         r = requests.get('https://penguin-stats.io/PenguinStats/api/v2/items')
         result = str(r.json())
         with open(r'.\Data\items.json', 'w', encoding='utf8') as f:
             f.write(result)
-
-
-if __name__ == '__main__':
-    p = Penguin()
-    p.update_id('66068307')
-    p.update_report('a', 'b', '11223', 14)
-    p.remove_report()
-    # p.update_need('提纯源岩', 8)
-    # p.update_report('pro_a_2', 'SPECIAL_DROP', 'ap_supply_lt_010',1)
-    # print(p.report(),'\n')
-    # data = p.plan()
-    # print('预计理智花费:', data['cost'])
-    # print('预计获得经验:', data['exp'])
-    # print('预计龙门币收入:', data['gold'])
-    # print()
-    # [print('运行关卡:', x['stage'], x['count'], '次') for x in data['stages']]
-    # print()
-    # [print('合成:', x['target'], x['count'], '次') for x in data['syntheses']]
