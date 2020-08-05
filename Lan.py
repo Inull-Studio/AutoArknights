@@ -10,7 +10,7 @@ def _scan(host, port):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((socket.gethostbyname(host), port))
         s.close()
-    except Exception as e:
+    except:
         pass
     else:
         sport.append(port)
@@ -32,5 +32,5 @@ def Connects(host, ports: list):
 
 
 if __name__ == '__main__':
-    a = Connects('192.168.0.101', [x for x in range(100, 1000)])
+    a = Connects('192.168.1.110', [x for x in range(100, 65550)])
     print(a)

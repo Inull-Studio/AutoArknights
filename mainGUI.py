@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainGUI.ui'
+# Form implementation generated from reading ui file 'UI\mainGUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -83,6 +83,10 @@ class Ui_MainWindow(object):
         self.del_plan.setObjectName("del_plan")
         self.refresh_data = QtWidgets.QAction(MainWindow)
         self.refresh_data.setObjectName("refresh_data")
+        self.setting = QtWidgets.QAction(MainWindow)
+        self.setting.setObjectName("setting")
+        self.delbtn = QtWidgets.QAction(MainWindow)
+        self.delbtn.setObjectName("delbtn")
         self.menu.addAction(self.CreateTab)
         self.menu.addAction(self.DeleteTab)
         self.menu.addSeparator()
@@ -90,6 +94,8 @@ class Ui_MainWindow(object):
         self.menu_2.addAction(self.Scan)
         self.menu_2.addAction(self.RemoteScan)
         self.menu_2.addAction(self.UnScan)
+        self.menu_3.addAction(self.setting)
+        self.menu_3.addAction(self.delbtn)
         self.menu_3.addAction(self.DeleteAllLog)
         self.menu_4.addAction(self.Soft)
         self.menu_4.addAction(self.Author)
@@ -154,3 +160,6 @@ class Ui_MainWindow(object):
         self.del_report.setText(_translate("MainWindow", "删除数据"))
         self.del_plan.setText(_translate("MainWindow", "删除数据"))
         self.refresh_data.setText(_translate("MainWindow", "刷新数据"))
+        self.setting.setText(_translate("MainWindow", "设置"))
+        self.delbtn.setText(_translate("MainWindow", "删除设置"))
+        self.delbtn.setToolTip(_translate("MainWindow", "删除config.ini中的General设置"))
