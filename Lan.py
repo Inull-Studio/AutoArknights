@@ -2,14 +2,15 @@ import socket
 import threading
 
 sport = []
-socket.setdefaulttimeout(0.5)
+socket.setdefaulttimeout(1)
 
 
-def _scan(host, port):
+# 测试当前主机和端口是否开放，直接使用socket连接
+def connScan(host, port):
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((socket.gethostbyname(host), port))
-        s.close()
+        connSkt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connSkt.connect((socket.gethostbyname(host), port))
+        connSkt.close()
     except:
         pass
     else:
@@ -21,16 +22,20 @@ def Connects(host, ports: list):
     try:
         socket.gethostbyname(host)
         for port in ports:
-            t = threading.Thread(target=_scan, args=(host, int(port)))
+            t = threading.Thread(target=connScan, args=(host, int(port)))
             tlist.append(t)
             t.start()
         for t in tlist:
             t.join()
     except socket.gaierror:
         return 'unknow hostname'
-    return sport if sport else False
+    if sport:
+        sport.sort()
+        return sport
+    else:
+        return False
 
 
 if __name__ == '__main__':
-    a = Connects('192.168.1.110', [x for x in range(100, 65550)])
+    a = Connects('192.168.1.100', [x for x in range(1, 65535)])
     print(a)

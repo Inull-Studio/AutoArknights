@@ -58,8 +58,9 @@ class Penguin(object):
             return 'no userID'
         if not self.report_json['drops']:
             return 'no drops'
-        r = requests.post(self.report_url, json=self.report_json,
-                          headers=self.header, verify=False, cookies=self.cookies)
+        r = requests.post(
+            self.report_url, json=self.report_json,
+            headers=self.header, verify=False, cookies=self.cookies)
         if r.status_code == 201:
             self.report_json['drops'] = []
             self.report_json['stageId'] = ''
@@ -104,8 +105,9 @@ class Penguin(object):
         if not self.required['required']:
             return None
         QGuiApplication.processEvents()
-        r = requests.post(self.plan_url, json=self.required,
-                          headers=self.header, verify=False, cookies=self.cookies)
+        r = requests.post(
+            self.plan_url, json=self.required,
+            headers=self.header, verify=False, cookies=self.cookies)
         if r.status_code == 200:
             self.required['required'] = {}
             os.remove(r'.\temp_Data\need.txt')
@@ -125,10 +127,10 @@ class Penguin(object):
         format_text += '预计理智花费: '+cost+'\n'
         format_text += '预计获得经验: '+exp+'\n'
         format_text += '预计龙门币收入: '+gold+'\n'
-        stages = ['运行:'+' '+x['stage']+' ' +
-                  x['count']+' '+'次' for x in plan['stages']]
-        synthesis = ['合成:'+' '+x['target']+' ' +
-                     x['count']+' '+'次' for x in plan['syntheses']]
+        stages = [
+            '运行:'+' '+x['stage']+' ' + x['count']+' '+'次' for x in plan['stages']]
+        synthesis = [
+            '合成:'+' '+x['target']+' ' + x['count']+' '+'次' for x in plan['syntheses']]
         for stage in stages:
             format_text += stage+'\n'
         for synthesi in synthesis:
@@ -219,16 +221,16 @@ class Penguin(object):
     def get_stage_itemId_by_droptype(stage: str, drop_type: str):
         drop_infos = Penguin.get_dropinfos(stage)
         for x in drop_infos:
-            item_id = [y['itemId']
-                       for y in x if drop_type in y.values() and 'itemId' in y.keys()]
+            item_id = [
+                y['itemId']for y in x if drop_type in y.values() and 'itemId' in y.keys()]
         return item_id
 
 # 获取所有关卡掉落信息
     @ staticmethod
     def get_dropinfos(stage: str):
         data = Penguin.get_stage()
-        drop_infos = [x['dropInfos']
-                      for x in data if 'dropInfos' in x.keys() and stage in x.values()]
+        drop_infos = [
+            x['dropInfos']for x in data if 'dropInfos' in x.keys() and stage in x.values()]
         return drop_infos
 
 # 获取关卡中所有掉落物品类型

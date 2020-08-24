@@ -67,7 +67,6 @@ class Tab(QWidget, Ui_Form):
 
 # 显示当前链接设备
 
-
     def disp(self):
         if not self.device_name:
             self.setLog(self.disp_btn.text(), logging.WARNING, '未选择设备')
@@ -428,7 +427,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.Help.triggered.connect(self.showHelp)
         self.Author.triggered.connect(self.showAuthor)
         self.Soft.triggered.connect(self.showSoft)
-        self.UnScan.triggered.connect(self.delConfig)
+        self.UnScan.triggered.connect(self.delScan)
         self.RemoteScan.triggered.connect(self.RS)
         self.login_ID.triggered.connect(self.login)
         self.add_plan.triggered.connect(self.append_plan)
@@ -440,6 +439,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         self.setting.triggered.connect(self.run_setting)
         self.delbtn.triggered.connect(self.delsetting)
 
+# 登入PenguinID
     def login(self):
         userid, ok = QInputDialog.getText(self, '请输入ID', '请输入登入ID')
         if ok:
@@ -449,6 +449,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             self.p.update_id(userid)
             QMessageBox.information(self, '登入成功', '已登入ID:'+userid)
 
+# 删除汇报内容
     def remove_report(self):
         while True:
             try:
@@ -476,9 +477,14 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(self, '错误', '未添加过数据')
                 return
 
+# 开始汇报
     def run_report(self):
-        ask = QMessageBox(QMessageBox.Warning, '警告',
-                          '<h1>请确认提交数据属实，否则可能会被判为异常处理</h1>', QMessageBox.Yes | QMessageBox.No)
+        ask = QMessageBox(
+            QMessageBox.Warning,
+            '警告',
+            '<h1>请确认提交数据属实，否则可能会被判为异常处理</h1>',
+            QMessageBox.Yes | QMessageBox.No
+        )
         ok = ask.exec()
         if ok == QMessageBox.Yes:
             Hash = self.p.report()
@@ -494,6 +500,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 with open(r'.\Data\Report\{} report.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
                     f.write(Hash)
 
+# 删除规划内容
     def remove_plan(self):
         while True:
             try:
@@ -514,14 +521,18 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(self, '错误', '未添加过数据')
                 return
 
+# 开始规划
     def run_plan(self):
         od = QDialog()
         opt = PlanOption_Dialog()
         opt.setupUi(od)
         ok = od.exec()
         if ok == QDialog.Accepted:
-            plan_result = self.p.plan(opt.extra.isChecked(
-            ), opt.more_exp.isChecked(), opt.more_gold.isChecked())
+            plan_result = self.p.plan(
+                opt.extra.isChecked(),
+                opt.more_exp.isChecked(),
+                opt.more_gold.isChecked()
+            )
             result = Material.Penguin.format_plan(plan_result)
             if not result:
                 QMessageBox.warning(self, '无规划结果', '请检查是否添加数据')
@@ -531,6 +542,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 QMessageBox.information(
                     self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\Plan文件夹中,需要手动清理')
 
+# 添加汇报内容
     def append_report(self):
         while True:
             rd = QDialog()
@@ -541,8 +553,8 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 if not stage.drop_type.currentText() or not stage.item_name.currentText():
                     QMessageBox.warning(self, '错误', '未选择物品')
                     continue
-                result = self.p.update_report(Material.Penguin.get_stageId_by_code(stage.stage.currentText()), Material.Penguin.droptype_to_EN(
-                    stage.drop_type.currentText()), Material.Penguin.name_to_itemid(stage.item_name.currentText()), stage.item_quantity.value())
+                result = self.p.update_report(
+                    Material.Penguin.get_stageId_by_code(stage.stage.currentText()), Material.Penguin.droptype_to_EN(stage.drop_type.currentText()),                                              Material.Penguin.name_to_itemid(stage.item_name.currentText()), stage.item_quantity.value())
                 if result:
                     QMessageBox.information(self, '添加成功', '添加成功')
                 else:
@@ -550,6 +562,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             else:
                 break
 
+# 添加规划内容
     def append_plan(self):
         temp = ''
         while True:
@@ -566,11 +579,13 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 break
         QMessageBox.information(self, '添加成功', temp)
 
+# 远程扫描
     def RS(self):
         lasthost = []
         lastport = []
         host, hok = QInputDialog.getText(
-            self, '输入主机', '请输入主机名或IP地址\n127.0.0.1本地ip就不用输了,浪费性能和资源\n注意！如果配置文件中存在本地端口,则会使用本地端口进行测试,可能会造成检测不到!')
+            self, '输入主机',
+            '请输入主机名或IP地址\n127.0.0.1本地ip就不用输了,直接扫描本地模拟器\n注意！如果配置文件中存在本地端口,则会使用本地端口进行测试,可能会造成检测不到!')
         if hok:
             if not host:
                 QMessageBox.warning(self, '错误', '未输入主机名或IP地址')
@@ -578,7 +593,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             else:
                 if con.get('Nox', 'portlist'):
                     a = QMessageBox(QMessageBox.Question, '是否使用本地端口',
-                                    '检测到本地存在模拟器\n是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是方便)', QMessageBox.Yes | QMessageBox.No)
+                                    '检测到本地存在模拟器\n是否用本地端口扫描远程端口?(这可能会导致扫描不到远程模拟器,因为端口原因,但是不用手动输入端口)', QMessageBox.Yes | QMessageBox.No)
                     ok = a.exec()
                     if ok == QMessageBox.Yes:
                         portlist = eval(con.get('Nox', 'portlist'))
@@ -691,7 +706,8 @@ class MainWin(QMainWindow, Ui_MainWindow):
                                 QMessageBox.information(
                                     self, '完成', '远程主机扫描完成，刷新设备会检测链接')
 
-    def delConfig(self):
+# 删除扫描结果
+    def delScan(self):
         con.set('Nox', 'dir', '')
         con.set('Nox', 'portlist', '')
         con.set('Nox', 'rhost', '')
@@ -699,11 +715,13 @@ class MainWin(QMainWindow, Ui_MainWindow):
         con.write(open('config.ini', 'w'))
         QMessageBox.information(self, '通知', '已经删除config.ini扫描结果')
 
+# 删除设置
     def delsetting(self):
         con.set('General', 'exec', '')
         con.write((open('config.ini', 'w')))
         QMessageBox.information(self, '通知', '已经删除config.ini General设置')
 
+# 自检
     def firstCheck(self):
         if not os.path.exists('.\\Log'):
             os.mkdir('Log')
@@ -718,6 +736,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         if not os.path.exists(r'.\Data\Mission'):
             os.mkdir(r'.\Data\Mission')
 
+# 检测本地模拟器、端口
     def __listPort(self):
         if not con.get('Nox', 'dir'):
             try:
@@ -748,6 +767,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         else:
             raise
 
+# 删除所有日志
     def delLog(self):
         try:
             os.chdir('Log')
@@ -756,6 +776,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         except:
             QMessageBox.critical(self, '错误', '请关闭程序再重试')
 
+# 使用帮助
     def showHelp(self):
         QMessageBox.about(self, '使用帮助', '''
         Config.ini和软件本身是重要文件，必须存在，如果不存在会报错
@@ -764,30 +785,39 @@ class MainWin(QMainWindow, Ui_MainWindow):
         单击"设备"->"扫描"，可以扫描夜神模拟器所在目录和夜神模拟器多开数量，每多开一个模拟器必须删除扫描结果，然后重新扫描
         更多详细资料请在 Help.chm 中查看''')
 
+
+# 关于作者
+
     def showAuthor(self):
-        QMessageBox.about(self, '关于作者', '''
+        QMessageBox.about(self, '关于作者', f'''
         作者QQ：2293830442
         作者Github：https://github.com/basket-ball
         作者bilibili：https://space.bilibili.com/16057264
         作者CSDN：https://blog.csdn.net/qq_40173711''')
 
+# 关于软件
     def showSoft(self):
         QMessageBox.about(
             self, '关于软件', '版权所有CopyRight © 2020 Moran-Studio')
 
+# 扫描本地模拟器
     def ScanEq(self):
         try:
             self.__listPort()
         except Exception as e:
             print(repr(e))
             QMessageBox.warning(
-                self, '模拟器不存在', '夜神模拟器不存在,在链接内刷新设备可连接手机/或点击远程扫描')
+                self,
+                '模拟器不存在',
+                '夜神模拟器不存在,在链接内刷新设备可连接手机/或点击远程扫描')
 
+# 删除链接
     def delTab(self):
         self.MainTab.removeTab(self.MainTab.currentIndex())
         del self.MainTab.children()[0].children()[
             self.MainTab.currentIndex()+1]
 
+# 添加链接
     def addNewTab(self):
         tabname, ok = QInputDialog.getText(self, '输入名称', '请输入新建标签页名称')
         if ok:
@@ -798,6 +828,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 NewTab.setObjectName(tabname)
                 self.MainTab.addTab(NewTab, tabname)
 
+# 设置界面
     def run_setting(self):
         dialog = QDialog()
         set_Dialog = setting.Ui_Dialog()
@@ -831,10 +862,14 @@ class MainWin(QMainWindow, Ui_MainWindow):
 
         set_Dialog.Nox_button.clicked.connect(_select_directory)
         set_Dialog.Adb_button.clicked.connect(_select_file)
+
         ok = dialog.exec()
         if ok == QDialog.Accepted:
             if not set_Dialog.Nox_text.text() or not set_Dialog.Adb_text.text():
-                QMessageBox.critical(self, '未知的文件/目录', '请选择正确的文件/目录')
+                QMessageBox.critical(
+                    self,
+                    '未知的文件/目录',
+                    '请选择正确的文件/目录')
                 return
             con.set('Nox', 'dir', set_Dialog.Nox_text.text())
             con.set('General', 'exec', '/'.join(
@@ -847,8 +882,12 @@ if __name__ == '__main__':
         os.chdir(popen('cd').read().strip('\n'))
         app = QApplication(sys.argv)
         win = MainWin()
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                             r'Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store')
+
+        key = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER,
+            r'Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store'
+        )
+
         if not os.path.exists('config.ini'):
             raise FileNotFoundError
         con = ConfigParser()
