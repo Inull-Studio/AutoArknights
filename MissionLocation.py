@@ -13,6 +13,8 @@ logLevel = {10: 'DEBUG', 20: 'INFO',
 
 
 class M_to_L(object):
+    """Mission to Location"""
+
     def __init__(self, lizhi: dict, loger: logging.RootLogger, logText, mission: str = '自己指定关卡'):
         self.mission = mission
         self.tap_str = r'.\Data\tools\adb -s {} shell input tap {} {}'
@@ -33,13 +35,13 @@ class M_to_L(object):
         system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/1.png')
         data = imread('temp_Data\\three.png')
         detail_img = data[int(data.shape[0]/(18/11)):]
-        stage_img = rimg[int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),
-                         int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
+        stage_img = rimg[
+            int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),
+            int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))
+        ]
         if data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 62:
-            system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             return 'Yes'
         elif data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 74:
-            system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
             return 'No'
         else:
             return 'False'

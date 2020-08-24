@@ -67,6 +67,7 @@ class Tab(QWidget, Ui_Form):
 
 # 显示当前链接设备
 
+
     def disp(self):
         if not self.device_name:
             self.setLog(self.disp_btn.text(), logging.WARNING, '未选择设备')
@@ -188,11 +189,19 @@ class Tab(QWidget, Ui_Form):
                             self._enable_list()
                             return
                         self.setLog('ThreeStars', logging.WARN, '检测到未三星')
+                        self.save_Mission()
+                        run([
+                            r'.\Data\tools\adb', '-s', self.get_current_Eq(),
+                            'shell', 'input', 'tap', '100', '100'])
+                        sleep(8)
                         break
                     elif 'Y' in three:
                         self.setLog('ThreeStars', logging.INFO, '是三星')
                         self.run_times += 1
                         self.save_Mission()
+                        run([
+                            r'.\Data\tools\adb', '-s', self.get_current_Eq(),
+                            'shell', 'input', 'tap', '100', '100'])
                         sleep(8)
                         break
                     pass
@@ -218,8 +227,16 @@ class Tab(QWidget, Ui_Form):
                 else:
                     self._enable_list()
                     return
-                run([r'.\Data\tools\adb', '-s', self.get_current_Eq(), 'shell', 'input', 'tap', str(
-                    int(self.Screen_size[0]*(10/12))), str(int(self.Screen_size[1]*(25/36)))], stdout=PIPE)
+                run([
+                    r'.\Data\tools\adb',
+                    '-s',
+                    self.get_current_Eq(),
+                    'shell',
+                    'input',
+                    'tap',
+                    str(int(self.Screen_size[0]*(10/12))),
+                    str(int(self.Screen_size[1]*(25/36)))
+                ])
                 self.setLog('LoopMission', logging.INFO, '进入关卡,60秒后循环检测运行状态')
                 sleep(60)
                 while True:
@@ -237,11 +254,19 @@ class Tab(QWidget, Ui_Form):
                             self._enable_list()
                             return
                         self.setLog('ThreeStars', logging.WARN, '检测到未三星')
+                        self.save_Mission()
+                        run([
+                            r'.\Data\tools\adb', '-s', self.get_current_Eq(),
+                            'shell', 'input', 'tap', '100', '100'])
+                        sleep(8)
                         break
                     elif 'Y' in three:
                         self.setLog('ThreeStars', logging.INFO, '是三星')
                         self.run_times += 1
                         self.save_Mission()
+                        run([
+                            r'.\Data\tools\adb', '-s', self.get_current_Eq(),
+                            'shell', 'input', 'tap', '100', '100'])
                         sleep(8)
                         break
                     pass
@@ -277,8 +302,11 @@ class Tab(QWidget, Ui_Form):
                     self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
 
         def Connect(port, host='127.0.0.1'):
-            run([r'.\Data\tools\adb.exe', 'connect',
-                 f'{host}:{port}'], stdout=PIPE)
+            run([
+                r'.\Data\tools\adb.exe',
+                'connect',
+                f'{host}:{port}'])
+
         rhosts = con.get('Nox', 'rhost')
         lports = con.get('Nox', 'portlist')
         if lports:
@@ -366,11 +394,11 @@ class Tab(QWidget, Ui_Form):
 
 # 运行完保存关卡结算图片
     def save_Mission(self):
-        if not os.path.isfile(r'.\Data\Mission\{}_{}_{}.png'.format(
-                self.tabname, self.running_mission, self.run_times)):
-            shutil.copy(r'.\temp_Data\three.png',
-                        r'.\Data\Mission\{}_{}_{}.png'.format(
-                            self.tabname, self.running_mission, self.run_times))
+        if not os.path.isfile(
+                r'.\Data\Mission\{}_{}_{}.png'.format(self.tabname, self.running_mission, self.run_times)):
+            shutil.copy(
+                r'.\temp_Data\three.png',
+                r'.\Data\Mission\{}_{}_{}.png'.format(self.tabname, self.running_mission, self.run_times))
 
 # 启用界面
     def _enable_list(self):
