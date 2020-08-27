@@ -37,7 +37,6 @@ class M_to_L(object):
         self.screen(eq, 'three.png')
         data = imread('temp_Data\\three.png')
         detail_img = data[int(data.shape[0]/(18/11)):]
-        print(data.shape)
         stage_img = rimg[
             int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),
             int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
@@ -61,11 +60,11 @@ class M_to_L(object):
             return False
 
     def kaiqidaili(self, eq: str, size: list):
-        print(self.Adb_dir)
         self.setLog(self.mission, logging.INFO, '正在检测是否开启代理')
         sleep(1)
         self.screen(eq, 'daili.png')
         dailiImg = imread(r'.\temp_Data\daili.png')
+        print(dailiImg.shape)
         if dailiImg[int(size[0]*(123/144)), int(size[1]*(59/72))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
             system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
@@ -322,11 +321,11 @@ class M_to_L(object):
             sleep(0.5)
 
     def LS(self, eq: str, size: list):
-        system(self.tap_str.format(eq, size[0]*0.75, size[1]*(2/9)))
+        self.tap(eq, size[0]*0.75, size[1]*(2/9))
         sleep(0.5)
-        system(self.tap_str.format(eq, size[0]*0.1875, size[1]*(83/90)))
+        self.tap(eq, size[0]*0.1875, size[1]*(83/90))
         sleep(0.5)
-        system(self.tap_str.format(eq, size[0]*0.125, size[1]*(4/9)))
+        self.tap(eq, size[0]*0.125, size[1]*(4/9))
         sleep(0.5)
 
     def SK(self, eq: str, size: list):
@@ -522,16 +521,19 @@ class M_to_L(object):
         system(self.tap_str.format(eq, size[0]*0.875, size[1]*(8/9)))
 
     def tap(self, eq: str, x: int, y: int):
-        run(self.tap_str.format(eq, str(x), str(y)), stdout=PIPE)
+        run([self.Adb_dir, '-s', eq, 'shell', 'tap', str(x), str(y)], stdout=PIPE)
 
     def screen(self, eq: str, file: str):
-        print('截图中')
         run([self.Adb_dir, '-s', eq, 'shell', 'screencap', f'/sdcard/{file}'])
         run([self.Adb_dir, '-s', eq, 'pull',
-             f'/sdcard/{file}', f'temp_Data/{file}'])
+             f'/sdcard/{file}', f'{file}'])
         run([self.Adb_dir, '-s', eq, 'shell', 'rm', f'/sdcard/{file}'])
 
     def setLog(self, mission, level, msg):
         logmsg = f'{logLevel[level]} {mission}.{msg}'
         self.loger.log(level, f'{mission}.{msg}')
         self.logText.append(logmsg)
+
+
+if __name__ == "__main__":
+    img = imread('temp_Data/lizhi.png')

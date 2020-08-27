@@ -1,6 +1,7 @@
 # coding:utf-8
 import sys
 import winreg
+import asyncio
 import win32gui
 import win32api
 import ctypes
@@ -46,10 +47,9 @@ class Tab(QWidget, tab.Ui_Form):
         self.yaoji.clicked.connect(self.yaoji_clicked)
         self.yuanshi.clicked.connect(self.yuanshi_click)
         self.MissionTree.itemClicked.connect(self.Mission_clicked)
-        self.Eqlist.itemClicked.connect(
-            lambda: threading.Thread(target=self.Eq_clicked, daemon=True).start())
-        self.RefreshBtn.clicked.connect(
-            lambda: threading.Thread(target=self.testEq).start())
+        self.Eqlist.itemClicked.connect(lambda x: threading.Thread(
+            target=self.Eq_clicked, args=()).start())
+        self.RefreshBtn.clicked.connect(self.testEq)
         self.RunBtn.clicked.connect(self.Run_clicked)
         self.EndButon.clicked.connect(self.KillRun)
         self.Times.valueChanged.connect(self.xianzhiTimes)
@@ -268,14 +268,13 @@ class Tab(QWidget, tab.Ui_Form):
 
 # 选择设备时运行
     def Eq_clicked(self):
-        self.setLog('设备选择', logging.INFO, '正在选择设备、测试')
-        self.Screen_size = [int(x) for x in run([
-            self.Adb_dir, '-s',
-            '{}'.format(self.get_current_Eq()), 'shell',
-            'wm', 'size'
-        ], stdout=PIPE, encoding='utf8').stdout.split('\n')[0].split(' ')[-1].split('x')]
-        self.device_name = popen(
-            self.Adb_dir+r' -s {} shell getprop ro.product.model'.format(self.get_current_Eq())).read().strip('\n')
+        self.setLog('设备选择', logging.INFO, '正在选择设备、测试(可能会卡顿')
+        res = run([self.Adb_dir, '-s', f'{self.get_current_Eq()}',
+                   'shell', 'wm', 'size'], stdout=PIPE, encoding='utf8').stdout
+        res = res.split('\n')[0].split(' ')[-1].split('x')
+        self.Screen_size = [int(x) for x in res]
+        self.device_name = run([self.Adb_dir, '-s', self.get_current_Eq(), 'shell',
+                                'getprop', 'ro.product.model'], stdout=PIPE, encoding='utf8').stdout[:-1]
         if not self.Screen_size[0]:
             self.setLog('设备选择', logging.INFO,
                         self.get_current_Eq()+' 未知错误,设备无法连接')
@@ -295,18 +294,14 @@ class Tab(QWidget, tab.Ui_Form):
         self.setLog(self.RefreshBtn.text(), logging.INFO,
                     self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
 
-        def Connect(port, host='127.0.0.1'):
-            run([
-                self.Adb_dir,
-                'connect',
-                f'{host}:{port}'])
-
+        def connect(host: str, port: str):
+            run([self.Adb_dir, 'connect', f'{host}:{port}'], stdout=PIPE)
         rhosts = con.get('Nox', 'rhost')
         lports = con.get('Nox', 'portlist')
         if lports:
             for port in eval(lports):
-                t = threading.Thread(target=Connect, args=(port,), daemon=True)
-                t.start()
+                threading.Thread(target=connect, args=(
+                    '127.0.0.1', port)).start()
             for l in run([self.Adb_dir, 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                 if 'List' in l.split(' '):
                     continue
@@ -330,36 +325,33 @@ class Tab(QWidget, tab.Ui_Form):
         if rhosts:
             rports = con.get('Nox', 'rport')
             if rports:
-                for port in eval(rports):
-                    for host in eval(rhosts):
-                        t = threading.Thread(
-                            target=Connect, args=(port, host), daemon=True)
-                        t.start()
+                for rhost in eval(rhosts):
+                    for rport in rports:
+                        threading.Thread(
+                            target=connect, args=(rhost, rport)).start()
                 for l in run([self.Adb_dir, 'devices'], stdout=PIPE, encoding='utf8').stdout.rstrip('\n').split('\n'):
                     if 'List' in l.split(' '):
                         continue
                     if 'offline' in l:
                         continue
                     b = l.split('\t')[0]
-                    for host in eval(rhosts):
-                        for port in eval(rports):
-                            if not b:
-                                self.setLog(
-                                    '设备选择', logging.INFO, self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
-                                return
-                            if '127.0.0.1' in b:
-                                eq_list.append(b+'\t模拟器')
-                            elif host in b and int(port) > 50000:
-                                eq_list.append(b+'\t模拟器')
-                            else:
-                                eq_list.append(b+'\t手机')
+                    if not b:
+                        self.setLog(
+                            '设备选择', logging.INFO, self.Eqlist.objectName()+' 未检测到设备开启,请重新运行')
+                        return
+                    if '127.0.0.1' in b:
+                        eq_list.append(b+'\t模拟器')
+                    elif host in b and int(port) > 50000:
+                        eq_list.append(b+'\t模拟器')
+                    else:
+                        eq_list.append(b+'\t手机')
                     eq_list = list(set(eq_list))
                 if eq_list:
                     self.Eqlist.addItems(eq_list)
             else:
                 self.setLog(self.RefreshBtn.text(),
                             logging.WARNING, '远程地址未有设备(未扫远程描模)')
-                return
+            return
         self.setLog(self.RefreshBtn.text(), logging.INFO,
                     self.Eqlist.objectName()+' 测试完成')
 
