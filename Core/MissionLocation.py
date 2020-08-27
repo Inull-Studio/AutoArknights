@@ -3,6 +3,7 @@ from time import sleep
 from subprocess import run, PIPE
 import logging
 from threading import Thread
+from configparser import ConfigParser
 from PyQt5.QtWidgets import QWidget
 from os import system, remove
 import datetime
@@ -11,13 +12,17 @@ from cv2 import imread
 logLevel = {10: 'DEBUG', 20: 'INFO',
             30: 'WARNING', 40: 'ERROR', 50: 'CRITICAL'}
 
+con = ConfigParser()
+con.read('config.ini', encoding='utf8')
+
 
 class M_to_L(object):
     """Mission to Location"""
 
     def __init__(self, lizhi: dict, loger: logging.RootLogger, logText, mission: str = '自己指定关卡'):
+        self.Adb_dir = con.get('General', 'exec')
         self.mission = mission
-        self.tap_str = r'.\Data\tools\adb -s {} shell input tap {} {}'
+        self.tap_str = self.Adb_dir+' -s {} shell input tap {} {}'
         self.lizhi = lizhi
         self.loger = loger
         self.logText = logText
@@ -29,16 +34,13 @@ class M_to_L(object):
         self.tap(eq, int(size[0]*(43/48)), int(size[1]*(11/12)))
 
     def sanxing(self, eq, size):
-        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/three.png')
-        system(r'.\Data\tools\adb -s '+eq +
-               ' pull /sdcard/three.png temp_Data\\three.png 1>nul 2>nul')
-        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/1.png')
+        self.screen(eq, 'three.png')
         data = imread('temp_Data\\three.png')
         detail_img = data[int(data.shape[0]/(18/11)):]
+        print(data.shape)
         stage_img = rimg[
             int(detail_img.shape[0]/7):int(detail_img.shape[0]/4),
-            int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))
-        ]
+            int(detail_img.shape[1]/72):int(detail_img.shape[1]/(1440/165))]
         if data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 62:
             return 'Yes'
         elif data[int(size[0]*(37/144)), int(size[1]*(51/72))][2] == 74:
@@ -48,11 +50,7 @@ class M_to_L(object):
 
     def shengji(self, eq, size):
         sleep(1)
-        system(r'.\Data\tools\adb -s '+eq +
-               ' shell screencap /sdcard/shengji.png')
-        system(r'.\Data\tools\adb -s '+eq +
-               ' pull /sdcard/shengji.png temp_Data\\shengji.png 1>nul 2>nul')
-        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/shengji.png')
+        self.screen(eq, 'shengji.png')
         data1 = imread('temp_Data\\shengji.png')
         if data1[int(size[0]*0.26875), int(size[1]*0.4)][2] == 1:
             self.setLog(self.mission, logging.INFO, '发生升级')
@@ -63,12 +61,10 @@ class M_to_L(object):
             return False
 
     def kaiqidaili(self, eq: str, size: list):
+        print(self.Adb_dir)
         self.setLog(self.mission, logging.INFO, '正在检测是否开启代理')
         sleep(1)
-        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/daili.png')
-        system(r'.\Data\tools\adb -s '+eq +
-               ' pull /sdcard/daili.png temp_Data\\daili.png >nul')
-        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/daili.png')
+        self.screen(eq, 'daili.png')
         dailiImg = imread(r'.\temp_Data\daili.png')
         if dailiImg[int(size[0]*(123/144)), int(size[1]*(59/72))][2] != 255:
             self.setLog(self.mission, logging.INFO, '未开启代理')
@@ -86,10 +82,7 @@ class M_to_L(object):
     def checklizhi(self, eq: str, size: list):
         self.setLog(self.mission, logging.INFO, '正在检测理智')
         sleep(0.5)
-        system(r'.\Data\tools\adb -s '+eq+' shell screencap /sdcard/lizhi.png')
-        system(r'.\Data\tools\adb -s '+eq +
-               ' pull /sdcard/lizhi.png temp_Data\\lizhi.png 1>nul 2>nul')
-        system(r'.\Data\tools\adb -s '+eq+' shell rm /sdcard/lizhi.png')
+        self.screen(eq, 'lizhi.png')
         lizhiImg = imread('temp_Data\\lizhi.png')
         if lizhiImg[int(size[0]*(120/144)), int(size[1]*(5/9))][2] != 130:
             if self.lizhi['buhuifu']:
@@ -110,14 +103,9 @@ class M_to_L(object):
                 elif self.lizhi['yuanshi']:
                     system(r'.\Data\tools\adb -s '+eq+' shell input tap ' +
                            str(size[0]*0.85625)+' '+str(size[1]*(34/45)))
-                    system(r'.\Data\tools\adb -s '+eq +
-                           ' shell screencap /sdcard/2.png')
-                    system(r'.\Data\tools\adb -s '+eq +
-                           ' pull /sdcard/2.png temp_Data\\2.png 1>nul 2>nul')
-                    system(r'.\Data\tools\adb -s ' +
-                           eq+' shell rm /sdcard/2.png')
+                    self.screen(eq, 'yuanshi.png')
                     sleep(1)
-                    shitou = imread('temp_Data\\2.png')
+                    shitou = imread('temp_Data\\yuanshi.png')
                     if shitou[int(size[0]*0.275), int(size[1]*(7/45))][2] == 255:
                         return False
                     return True
@@ -535,6 +523,13 @@ class M_to_L(object):
 
     def tap(self, eq: str, x: int, y: int):
         run(self.tap_str.format(eq, str(x), str(y)), stdout=PIPE)
+
+    def screen(self, eq: str, file: str):
+        print('截图中')
+        run([self.Adb_dir, '-s', eq, 'shell', 'screencap', f'/sdcard/{file}'])
+        run([self.Adb_dir, '-s', eq, 'pull',
+             f'/sdcard/{file}', f'temp_Data/{file}'])
+        run([self.Adb_dir, '-s', eq, 'shell', 'rm', f'/sdcard/{file}'])
 
     def setLog(self, mission, level, msg):
         logmsg = f'{logLevel[level]} {mission}.{msg}'
