@@ -8,9 +8,6 @@ import inspect
 from configparser import ConfigParser
 import os
 import shutil
-import Material
-import Lan
-from MissionLocation import M_to_L
 import re
 import threading
 from subprocess import run, PIPE
@@ -19,19 +16,14 @@ from time import sleep, strftime
 from PyQt5.QtWidgets import QWidget, QMainWindow, QDialog, QMessageBox, QInputDialog, QApplication, QFileDialog
 from PyQt5.QtCore import QTextCodec
 import logging
-from tab import Ui_Form
-from mainGUI import Ui_MainWindow
-from Plan import Ui_Dialog as Plan_Dialog
-from Report import Ui_Dialog as Report_Dialog
-from plan_option import Ui_Dialog as PlanOption_Dialog
-from R_Plan import Ui_Dialog as Rp_Dialog
-from R_Report import Ui_Dialog as Rr_Dialog
-import setting
+
+from Core import *
+
 
 logLevel = {10: 'DEBUG', 20: 'INFO', 30: 'WARN', 40: 'ERROR', 50: 'CRITICAL'}
 
 
-class Tab(QWidget, Ui_Form):
+class Tab(QWidget, tab.Ui_Form):
     """AutoArknights的核心界面(链接页面)"""
 
     def __init__(self, tabname: str, parent=None):
@@ -52,8 +44,8 @@ class Tab(QWidget, Ui_Form):
         self.yaoji.clicked.connect(self.yaoji_clicked)
         self.yuanshi.clicked.connect(self.yuanshi_click)
         self.MissionTree.itemClicked.connect(self.Mission_clicked)
-        self.Eqlist.itemClicked.connect(lambda: threading.Thread(
-            target=self.Eq_clicked, daemon=True).start())
+        self.Eqlist.itemClicked.connect(
+            lambda: threading.Thread(target=self.Eq_clicked, daemon=True).start())
         self.RefreshBtn.clicked.connect(
             lambda: threading.Thread(target=self.testEq).start())
         self.RunBtn.clicked.connect(self.Run_clicked)
@@ -131,9 +123,10 @@ class Tab(QWidget, Ui_Form):
         self.setLog(self.RunBtn.text(), logging.INFO, '=====开始运行=====')
         if self.SelfMission.isChecked():
             self.selfmission = True
-            mission = M_to_L(self.LiZhi, self.loger, self.LogText)
-            self.running = threading.Thread(target=self.LoopMission, args=(
-                mission,), daemon=True, name=self.tabname)
+            mission = MissionLocation.M_to_L(
+                self.LiZhi, self.loger, self.LogText)
+            self.running = threading.Thread(
+                target=self.LoopMission, args=(mission,), daemon=True, name=self.tabname)
             self.running.start()
             return
         if not self.Screen_size:
@@ -144,11 +137,11 @@ class Tab(QWidget, Ui_Form):
             self.setLog('关卡选择', logging.WARN, '没有选中关卡')
             self._enable_list()
             return
-        runMission = M_to_L(self.LiZhi, self.loger, self.LogText,
-                            self.running_mission)
+        runMission = MissionLocation.M_to_L(
+            self.LiZhi, self.loger, self.LogText, self.running_mission)
         M_location = runMission.retMission()
-        self.running = threading.Thread(target=self.LoopMission, args=(
-            runMission, M_location), daemon=True, name=self.tabname)
+        self.running = threading.Thread(
+            target=self.LoopMission, args=(runMission, M_location), daemon=True, name=self.tabname)
         self.running.start()
 
 # 循环运行
@@ -281,7 +274,6 @@ class Tab(QWidget, Ui_Form):
         self.Screen_size.sort()
         self.device_name = popen(
             r'.\Data\tools\adb -s {} shell getprop ro.product.model'.format(self.get_current_Eq())).read().strip('\n')
-        print('device')
         if not self.Screen_size[0]:
             self.setLog('设备选择', logging.INFO,
                         self.get_current_Eq()+' 未知错误,设备无法连接')
@@ -298,8 +290,8 @@ class Tab(QWidget, Ui_Form):
     def testEq(self):
         self.Eqlist.clear()
         eq_list = []
-        self.setLog(self.RefreshBtn.text(), logging.INFO,
-                    self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
+        self.setLog(
+            self.RefreshBtn.text(), logging.INFO, self.Eqlist.objectName()+' 正在测试设备连接,请稍等')
 
         def Connect(port, host='127.0.0.1'):
             run([
@@ -438,7 +430,7 @@ class Tab(QWidget, Ui_Form):
         self.LogText.append(logmsg)
 
 
-class MainWin(QMainWindow, Ui_MainWindow):
+class MainWin(QMainWindow, mainGUI.Ui_MainWindow):
     """AutoArknights主界面"""
 
     def __init__(self, parent=None):
@@ -482,7 +474,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         while True:
             try:
                 rrd = QDialog()
-                rp = Rr_Dialog()
+                rp = R_Report.Ui_Dialog()
                 rp.setupUi(rrd)
                 ok = rrd.exec()
                 if ok == QDialog.Accepted:
@@ -533,7 +525,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         while True:
             try:
                 rpd = QDialog()
-                name = Rp_Dialog()
+                name = R_Plan.Ui_Dialog()
                 name.setupUi(rpd)
                 ok = rpd.exec()
                 if ok == QDialog.Accepted:
@@ -552,7 +544,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
 # 开始规划
     def run_plan(self):
         od = QDialog()
-        opt = PlanOption_Dialog()
+        opt = plan_option.Ui_Dialog()
         opt.setupUi(od)
         ok = od.exec()
         if ok == QDialog.Accepted:
@@ -568,13 +560,13 @@ class MainWin(QMainWindow, Ui_MainWindow):
             with open('Data/Plan/{} plan.txt'.format(strftime('%Y-%m-%d %H_%M_%S')), 'x', encoding='utf8') as f:
                 f.write(result)
                 QMessageBox.information(
-                    self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\Plan文件夹中,需要手动清理')
+                    self, '规划结果', result + '\n规划数据已清空\n规划结果已存放在Data\\Plan文件夹中,需要手动清理')
 
 # 添加汇报内容
     def append_report(self):
         while True:
             rd = QDialog()
-            stage = Report_Dialog()
+            stage = Report.Ui_Dialog()
             stage.setupUi(rd)
             ok = rd.exec()
             if ok == QDialog.Accepted:
@@ -595,7 +587,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         temp = ''
         while True:
             pd = QDialog()
-            item = Plan_Dialog()
+            item = Plan.Ui_Dialog()
             item.setupUi(pd)
             ok = pd.exec()
             if ok == QDialog.Accepted:
@@ -836,8 +828,8 @@ class MainWin(QMainWindow, Ui_MainWindow):
             print(repr(e))
             QMessageBox.warning(
                 self,
-                '模拟器不存在',
-                '夜神模拟器不存在,在链接内刷新设备可连接手机/或点击远程扫描')
+                '未扫描到模拟器',
+                '未扫描到夜神模拟器,在链接内刷新设备可连接手机\n或点击远程扫描\n或手动添加设置')
 
 # 删除链接
     def delTab(self):
@@ -867,7 +859,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
         if dir:
             set_Dialog.Nox_text.setText(dir)
         if adb:
-            set_Dialog.Adb_text.setText(adb+'/adb.exe')
+            set_Dialog.Adb_text.setText(adb)
 
         def _select_file():
             if set_Dialog.Adb_text.text():
@@ -876,8 +868,7 @@ class MainWin(QMainWindow, Ui_MainWindow):
             else:
                 file_name, file_type = QFileDialog.getOpenFileName(
                     self, '请选择adb文件', os.getcwd(), '可执行文件(*.exe)')
-            print(file_name)
-            set_Dialog.Adb_text.setText('/'.join(file_name.split('/')[:-1]))
+            set_Dialog.Adb_text.setText(file_name)
 
         def _select_directory():
             if set_Dialog.Nox_text.text():
@@ -897,11 +888,10 @@ class MainWin(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(
                     self,
                     '未知的文件/目录',
-                    '请选择正确的文件/目录')
+                    '请选择正确的文件/目录\n夜神模拟器目录和Adb目录必须全部选择才可确定')
                 return
             con.set('Nox', 'dir', set_Dialog.Nox_text.text())
-            con.set('General', 'exec', '/'.join(
-                set_Dialog.Adb_text.text().split('/')[:-1]))
+            con.set('General', 'exec', set_Dialog.Adb_text.text())
             con.write(open('config.ini', 'w'))
 
 

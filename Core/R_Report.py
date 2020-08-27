@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Material import Penguin
+from .Material import Penguin
 
 
 class Ui_Dialog(object):

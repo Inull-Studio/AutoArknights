@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'f:\python\AutoArknights\UI\mainGUI.ui'
+# Form implementation generated from reading ui file 'd:\install\AutoArknights\UI\mainGUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.0
 #
@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 26))
         self.menubar.setObjectName("menubar")
         self.menu = QtWidgets.QMenu(self.menubar)
         self.menu.setObjectName("menu")
@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         self.DeleteTab.setShortcut(_translate("MainWindow", "Ctrl+D"))
         self.Exit.setText(_translate("MainWindow", "退出"))
         self.Exit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
-        self.Scan.setText(_translate("MainWindow", "扫描本地模拟器"))
+        self.Scan.setText(_translate("MainWindow", "扫描本地数据"))
         self.Scan.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.DeleteAllLog.setText(_translate("MainWindow", "删除所有日志文件"))
         self.DeleteAllLog.setShortcut(_translate("MainWindow", "Ctrl+L"))
