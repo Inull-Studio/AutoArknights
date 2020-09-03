@@ -1,3 +1,5 @@
+> 项目主功能暂时不好使。。又是个有生之年。。
+
 ## **[使用帮助](https://github.com/Moran-Studio/AutoArknights/wiki)**
 
 # AutoArknights
@@ -24,7 +26,11 @@
 
 - Python3 语言，PyQt5 新版图形界面，全平台兼容
 
+>天adb只做了windows的
+
 ### 基于 scrcpy 在 Windows 中显示界面
+
+> 目前已停用
 
 - [scrcpy](https://github.com/Genymobile/scrcpy)
 
