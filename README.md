@@ -2,6 +2,8 @@
 
 > 我要开始干了
 
+> 我咕了
+
 ## **[使用帮助](https://github.com/Moran-Studio/AutoArknights/wiki)**
 
 # AutoArknights
