@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>548</width>
-    <height>433</height>
+    <width>550</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -653,7 +653,7 @@
           <widget class="QCheckBox" name="buxianzhi">
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>100</width>
              <height>16777215</height>
             </size>
            </property>
@@ -700,7 +700,7 @@
           <widget class="QCheckBox" name="checkThree">
            <property name="maximumSize">
             <size>
-             <width>117</width>
+             <width>100</width>
              <height>16777215</height>
             </size>
            </property>
